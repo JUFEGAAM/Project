@@ -130,3 +130,111 @@
 * **Testing & Bugfixing (1 week):** Intensive playtesting (by self and others) to find and fix bugs. Adjust difficulty.
 * **Documentation & Presentation (1 week):** Clean and comment code. Write project documentation. Prepare a presentation (slides or video). Publish the game to GitHub Pages.
 * **Goal:** A polished, stable, well-documented final product ready for evaluation.
+
+# 📘 Project: Development Planning
+
+## 🧩 PHASE 1: PLANNING
+**Duration:** 2 weeks (Week 1-2)  
+**Total Hours:** 25h  
+
+| **ID** | **Task** | **Description** | **Hours** | **Priority** |
+|:--:|:--|:--|:--:|:--:|
+| 1.1 | Define numeric values of the game | Decide machine costs, offering points, game balance | 4h | 🔴 High |
+| 1.2 | Write dialogues for the god | At least 30 different dialogues (angry, happy, sarcastic, etc.) | 6h | 🔴 High |
+| 1.3 | Design resource system | Define all resources (wood, stone, gold...) and their rarity | 3h | 🔴 High |
+| 1.4 | Create file structure | Prepare index.html, style.css, game.js basic structure | 2h | 🔴 High |
+| 1.5 | Research game loops in JS | Study tutorials about setInterval, requestAnimationFrame | 4h | 🔴 High |
+| 1.6 | Document complete design | Write GDD (Game Design Document) with all mechanics | 5h | 🔴 High |
+| 1.7 | Setup development environment | Configure Git, GitHub, create repository, make first commit | 1h | 🟠 Medium |
+
+*🎯 Expected result:* Complete design documented, technical structure ready.
+
+---
+
+## ⚙️ PHASE 2: PRE-PRODUCTION (PROOF OF CONCEPT)
+**Duration:** 2 weeks (Week 3-4)  
+**Total Hours:** 28h  
+
+| **ID** | **Task** | **Description** | **Hours** | **Priority** |
+|:--:|:--|:--|:--:|:--:|
+| 2.1 | Implement basic click system | Button that adds +1 to a variable, display on screen | 3h | 🔴 High |
+| 2.2 | Create gameData variable | JavaScript structure to store all game state | 2h | 🔴 High |
+| 2.3 | Offer system to god | "Give to god" button that subtracts resources and gives points | 4h | 🔴 High |
+| 2.4 | Random dialogues of the god | Array with phrases, random selection, display on screen | 3h | 🔴 High |
+| 2.5 | Basic purchase system | Button to buy a machine, deduct points | 4h | 🔴 High |
+| 2.6 | Automatic production | setInterval where machines generate resources every second | 5h | 🔴 High |
+| 2.7 | Basic functional UI | Panels to show resources, points, machines | 4h | 🟠 Medium |
+| 2.8 | Initial testing and debugging | Test everything works, fix basic errors | 3h | 🔴 High |
+
+*🎯 Expected result:* Playable prototype with basic cycle working (click → offer → buy → automate).
+
+---
+
+## 🧱 PHASE 3A: PRODUCTION ALPHA
+**Duration:** 5 weeks (Week 5-9)  
+**Total Hours:** 62h  
+
+### 🔹 Weeks 5-6: Multiple Resource System (14h)
+| **ID** | **Task** | **Description** | **Hours** | **Priority** |
+|:--:|:--|:--|:--:|:--:|
+| 3A.1 | Implement multiple resources | Add wood, stone, iron, gold, gems to code | 4h | 🔴 High |
+| 3A.2 | Tier/rarity system | Classify resources by value, different colors | 3h | 🔴 High |
+| 3A.3 | Visual inventory | UI showing all your resources | 4h | 🟠 Medium |
+| 3A.4 | Icons/visual representation | Create or find simple icons for each resource | 3h | 🟢 Low |
+
+### 🔹 Week 7: Complete Machines System (16h)
+| **ID** | **Task** | **Description** | **Hours** | **Priority** |
+|:--:|:--|:--|:--:|:--:|
+| 3A.5 | Create machine types | Woodcutter, Quarry, Mine, Gem Extractor, etc. | 5h | 🔴 High |
+| 3A.6 | Variable cost system | Each machine costs differently, different production | 3h | 🔴 High |
+| 3A.7 | UI machines panel | Show how many machines you have, buy button for each | 5h | 🟠 Medium |
+| 3A.8 | Machine upgrade system | Ability to upgrade machines to produce more | 3h | 🟠 Medium |
+
+### 🔹 Week 8: Advanced God System (16h)
+| **ID** | **Task** | **Description** | **Hours** | **Priority** |
+|:--:|:--|:--|:--:|:--:|
+| 3A.9 | God mood system | Variable "mood" changes depending on what you give | 4h | 🔴 High |
+| 3A.10 | Different reactions per resource | God reacts differently to wood vs gems | 4h | 🔴 High |
+| 3A.11 | Effect of gems on mood | Ruby angers, Sapphire calms, etc. | 4h | 🔴 High |
+| 3A.12 | Patience bar | Decreases over time, creates pressure | 4h | 🟠 Medium |
+
+### 🔹 Week 9: Progression System (16h)
+| **ID** | **Task** | **Description** | **Hours** | **Priority** |
+|:--:|:--|:--|:--:|:--:|
+| 3A.13 | Level system | Level variable, experience, leveling up | 4h | 🔴 High |
+| 3A.14 | Unlocks per level | Each level unlocks new resources/machines | 5h | 🔴 High |
+| 3A.15 | Progress screen | UI showing current level, progress to next | 4h | 🟠 Medium |
+| 3A.16 | Victory condition | System to detect when you win | 3h | 🔴 High |
+
+*🎯 Expected result:* Fully playable game from start to finish with all core mechanics.
+
+---
+
+## 🚀 PHASE 3B: PRODUCTION BETA
+**Duration:** 4 weeks (Week 10-13)  
+**Total Hours:** 48h  
+
+(*Tables formatted the same way as above, with priorities colored and descriptions clear.*)
+
+---
+
+## 🏁 PHASE 4: FINALIZATION AND DELIVERY
+**Duration:** 4 weeks (Week 14-17)  
+**Total Hours:** 47h  
+
+(*Tables formatted the same way as above, clear and readable.*)
+
+---
+
+## 📊 TOTAL SUMMARY PER PHASE
+
+| **Phase** | **Weeks** | **Estimated Hours** |
+|:--|:--:|:--:|
+| Phase 1: Planning | 2 | 25h |
+| Phase 2: Pre-production | 2 | 28h |
+| Phase 3A: Production Alpha | 5 | 62h |
+| Phase 3B: Production Beta | 4 | 48h |
+| Phase 4: Finalization | 4 | 47h |
+| **TOTAL PROJECT** | **17 weeks** | **210h** |
+
+---
