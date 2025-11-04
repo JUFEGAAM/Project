@@ -97,5 +97,3 @@ Amb **10h/setmana** → **~14 setmanes** (3.5 mesos)
 Així tens marge pel polish (tasques BAIXA) si vas bé de temps! 🚀
 
 ---
-
-**Vols que et faci també un Gantt Chart o calendari setmanal detallat?**
