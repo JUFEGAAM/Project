@@ -1,240 +1,101 @@
-# VideoGame Project
-
-## Project Goals
-
-* **For the Developer:**
-    * Expand knowledge of HTML, CSS, and JavaScript outside of class.
-    * Learn project organization, logical planning, and effective problem-solving through tackling the challenges of this project.
-* **For the Player:**
-    * Provide a satisfying sense of progression.
-    * Allow for the optimization of machinery.
-    * Present an interesting story.
-
-## BrainStorm / Core Concept
-
-### General Concept
-* A mix of different concepts: An "incremental" game (like Cookie Clicker) combined with management and automation ideas from Factorio and Rimworld.
-
-### Core Mechanic: The Core / The God
-* The central idea is an entity in the world (a "Core" or "God") that acts as the main "point" producer.
-* This god has arrived on Earth and is taking advantage of you with its power.
-* You must give it offerings using game resources so it doesn't destroy everything.
-* It reacts differently depending on the offering.
-* It has emotions: angry, happy, generous, selfish, etc.
-* It may give clues about what it wants. Giving it the desired item results in a better reward.
-
-### Ritual Mechanic
-* Instead of just clicking, challenges or "rituals" from the god can appear.
-* Examples: a small question, a puzzle, a mini-game.
-* **Consequences:**
-    * **Failure:** Can subtract "points" or cause a negative effect.
-    * **Success:** Provides a small bonus.
-
-### Progression and Automation (Machinery & Workers)
-* Over time, you unlock more functions.
-* **Machinery:** Improves production. They are semi-manual (you have to be attentive to the process).
-* **Workers:** You can assign them to automate production. This is based on colony management genres (like Rimworld, Age of Empires).
-
-### Events
-* Instead of enemy swarms (which are difficult to make), there will be random events.
-* **Events sent by the god:** e.g., __"Give me 100 wood in 60 seconds or your production will drop 50% for 5 minutes."__
-* **Random events:** e.g., __"A meteor has destroyed a machine."__
-* Events can have a good side: The meteor leaves valuable fragments that can be offered to the core.
-
-### Karma System
-* You can follow the path of good things or the path of bad things.
-* A karma counter tracks this. When the game has to make a choice, it will give more probability to one outcome or another based on karma.
-
-### Story / Quests
-* Quests that make you learn more about the game's story.
-
-### Crafting
-* You have to fuse (combine) different materials to create new, more valuable items that you can gift to the god.
-
-### Game Resources
-* **Basic:** Wood, Stone, Iron, Gold, Food, Water.
-* **Valuable:** Platinum, Meteorite fragments, various Gems/valuable minerals.
-
-## Technical Stack & Viability
-
-* **Technologies:** HTML, CSS, JavaScript (as learned in class).
-* **Development Environment:**
-    * OS: Omarchy (Arch Linux + Hyprland)
-    * Code Editor: NeoVim
-    * Version Control: Git + GitHub
-    * Local Server: Python (local HTTP server)
-    * Testing Browser: Firefox
-    * Pixel Art Tool: Piskel or Aseprite
-* **Cost:** 0€ (all software is free and open source).
-* **Viability:** The project is technically viable. The required technologies are known, and the dev environment is professional and familiar.
-
-## Doubts / Technical Challenges
-
-* **Original Doubt:** Can I make the game save the players games? Should I? Is it difficult? What do I need? A database? A server?
-* **Answer/Plan:**
-    * A save/load system is planned.
-    * It seems it's not too difficult using JavaScript's `localStorage` function. This allows saving data even if the page is closed. It's a simple but functional solution.
-    * **Limitations:** If the player clears their browser data, the save will be lost. This is considered an acceptable limitation for the project.
-    * **Optional Improvement:** An "Export Game" button could be added for players who want to move their save between computers. The difficulty of this is currently unknown.
-* **Other Technical Features:**
-    * Game Menu.
-
-## Risk Analysis
-
-* **Technical Risk:** Might encounter JavaScript problems that are hard to solve.
-    * **Solution:** Use online communities (Stack Overflow, forums), tutorials, MDN documentation, and ask the professor.
-* **Time Risk:** Other subjects, homework, and exams could reduce available time.
-    * **Solution:** Realistic planning (10-20h/week), prioritizing core mechanics, and using a phased approach to always have a functional product.
-* **Scope Creep Risk:** Trying to add too many features and finishing nothing.
-    * **Solution:** Focus on a Minimum Viable Product (MVP) first. Extra features only if time allows. Maintain a clear list of "must-have" vs. "nice-to-have".
-* **Dependency Risk:** Problems with the development environment (Linux, NeoVim, etc.).
-    * **Solution:** The environment is very stable. Git/GitHub ensures the code is always saved and accessible. Development is possible from any machine with Linux if necessary.
-
-## Development Plan
-
-### General Strategy
-* The overall concept is interesting but complicated for a first project.
-* **PHASE 1 (Base):** Start with a solid foundation. Polish the main mechanics. Have a functional game that is fun, even if not beautiful or complete.
-* **PHASE 2 (Expansion):** Gradually add more features as time and skill allow.
-
-### Time Budget
-* **Project Duration:** 3-4 months (October - January/February).
-* **Weekly Availability:** 10-20 estimated hours/week (variable based on schoolwork).
-* **Total Hours Strategy:** Calculate the time for the basic version first. Improvements and additions will be made only if time is available. This ensures a functional product is always ready.
-
-### Phase 1: Planning (2 weeks)
-* **Focus:** Fully define the game idea. Finalize all main mechanics (resource gen, god offerings, points, progression).
-* **Tasks:** Define key numerical values (costs, points). Write a minimum of 30 god dialogues. Create the basic file structure (index.html, style.css, game.js). Research the "game loop" concept in JavaScript.
-* **Goal:** Have a clear, documented design and the project's technical base ready.
-
-### Phase 2: Pre-Production (Proof of Concept) (2 weeks)
-* **Focus:** Create a minimal but functional version (PoC) to validate the core idea.
-* **Tasks:**
-    * Manual resource generation (click).
-    * System to offer resources to the god for points.
-    * Purchase of one machine that auto-generates resources.
-    * Basic god feedback with random dialogues.
-* **Goal:** Have a playable prototype that demonstrates the main game cycle (generate, offer, improve).
-
-### Phase 3: Production (9 weeks)
-* **Focus:** Build all game features on top of the PoC.
-* **Alpha Stage (5 weeks):** Implement all central mechanics.
-    * Tasks: Multiple resource system (wood, stone, etc.). Full machine system (all machines, upgrades, costs). Dynamic god (mood system). Progression system and a clear victory condition.
-* **Beta Stage (4 weeks):** Add secondary systems for depth.
-    * Tasks: Workers and maintenance (hire workers, machines can break). Crafting system. Interactive rituals (minigames for special offerings). Random events (meteor showers, disasters).
-* **Goal:** A game that is complete in content and mechanics.
-
-### Phase 4: Finalization and Delivery (4 weeks)
-* **Focus:** Polish the game and prepare for final presentation.
-* **Visual/UX Polish (2 weeks):** Improve graphics (UI, icons, animations). Add key features: Save/Load system (`localStorage`) and a tutorial.
-* **Testing & Bugfixing (1 week):** Intensive playtesting (by self and others) to find and fix bugs. Adjust difficulty.
-* **Documentation & Presentation (1 week):** Clean and comment code. Write project documentation. Prepare a presentation (slides or video). Publish the game to GitHub Pages.
-* **Goal:** A polished, stable, well-documented final product ready for evaluation.
-
-# 📘 Project: Development Planning
-
-## 🧩 PHASE 1: PLANNING
-**Duration:** 2 weeks (Week 1-2)  
-**Total Hours:** 25h  
-
-| **ID** | **Task** | **Description** | **Hours** | **Priority** |
-|:--:|:--|:--|:--:|:--:|
-| 1.1 | Define numeric values of the game | Decide machine costs, offering points, game balance | 4h | 🔴 High |
-| 1.2 | Write dialogues for the god | At least 30 different dialogues (angry, happy, sarcastic, etc.) | 6h | 🔴 High |
-| 1.3 | Design resource system | Define all resources (wood, stone, gold...) and their rarity | 3h | 🔴 High |
-| 1.4 | Create file structure | Prepare index.html, style.css, game.js basic structure | 2h | 🔴 High |
-| 1.5 | Research game loops in JS | Study tutorials about setInterval, requestAnimationFrame | 4h | 🔴 High |
-| 1.6 | Document complete design | Write GDD (Game Design Document) with all mechanics | 5h | 🔴 High |
-| 1.7 | Setup development environment | Configure Git, GitHub, create repository, make first commit | 1h | 🟠 Medium |
-
-*🎯 Expected result:* Complete design documented, technical structure ready.
+Aquí tens la taula completa en markdown:
 
 ---
 
-## ⚙️ PHASE 2: PRE-PRODUCTION (PROOF OF CONCEPT)
-**Duration:** 2 weeks (Week 3-4)  
-**Total Hours:** 28h  
+# PLANIFICACIÓ DETALLADA - DIVINE TRIBUTE
 
-| **ID** | **Task** | **Description** | **Hours** | **Priority** |
-|:--:|:--|:--|:--:|:--:|
-| 2.1 | Implement basic click system | Button that adds +1 to a variable, display on screen | 3h | 🔴 High |
-| 2.2 | Create gameData variable | JavaScript structure to store all game state | 2h | 🔴 High |
-| 2.3 | Offer system to god | "Give to god" button that subtracts resources and gives points | 4h | 🔴 High |
-| 2.4 | Random dialogues of the god | Array with phrases, random selection, display on screen | 3h | 🔴 High |
-| 2.5 | Basic purchase system | Button to buy a machine, deduct points | 4h | 🔴 High |
-| 2.6 | Automatic production | setInterval where machines generate resources every second | 5h | 🔴 High |
-| 2.7 | Basic functional UI | Panels to show resources, points, machines | 4h | 🟠 Medium |
-| 2.8 | Initial testing and debugging | Test everything works, fix basic errors | 3h | 🔴 High |
+## Desglòs Complet d'Activitats
 
-*🎯 Expected result:* Playable prototype with basic cycle working (click → offer → buy → automate).
-
----
-
-## 🧱 PHASE 3A: PRODUCTION ALPHA
-**Duration:** 5 weeks (Week 5-9)  
-**Total Hours:** 62h  
-
-### 🔹 Weeks 5-6: Multiple Resource System (14h)
-| **ID** | **Task** | **Description** | **Hours** | **Priority** |
-|:--:|:--|:--|:--:|:--:|
-| 3A.1 | Implement multiple resources | Add wood, stone, iron, gold, gems to code | 4h | 🔴 High |
-| 3A.2 | Tier/rarity system | Classify resources by value, different colors | 3h | 🔴 High |
-| 3A.3 | Visual inventory | UI showing all your resources | 4h | 🟠 Medium |
-| 3A.4 | Icons/visual representation | Create or find simple icons for each resource | 3h | 🟢 Low |
-
-### 🔹 Week 7: Complete Machines System (16h)
-| **ID** | **Task** | **Description** | **Hours** | **Priority** |
-|:--:|:--|:--|:--:|:--:|
-| 3A.5 | Create machine types | Woodcutter, Quarry, Mine, Gem Extractor, etc. | 5h | 🔴 High |
-| 3A.6 | Variable cost system | Each machine costs differently, different production | 3h | 🔴 High |
-| 3A.7 | UI machines panel | Show how many machines you have, buy button for each | 5h | 🟠 Medium |
-| 3A.8 | Machine upgrade system | Ability to upgrade machines to produce more | 3h | 🟠 Medium |
-
-### 🔹 Week 8: Advanced God System (16h)
-| **ID** | **Task** | **Description** | **Hours** | **Priority** |
-|:--:|:--|:--|:--:|:--:|
-| 3A.9 | God mood system | Variable "mood" changes depending on what you give | 4h | 🔴 High |
-| 3A.10 | Different reactions per resource | God reacts differently to wood vs gems | 4h | 🔴 High |
-| 3A.11 | Effect of gems on mood | Ruby angers, Sapphire calms, etc. | 4h | 🔴 High |
-| 3A.12 | Patience bar | Decreases over time, creates pressure | 4h | 🟠 Medium |
-
-### 🔹 Week 9: Progression System (16h)
-| **ID** | **Task** | **Description** | **Hours** | **Priority** |
-|:--:|:--|:--|:--:|:--:|
-| 3A.13 | Level system | Level variable, experience, leveling up | 4h | 🔴 High |
-| 3A.14 | Unlocks per level | Each level unlocks new resources/machines | 5h | 🔴 High |
-| 3A.15 | Progress screen | UI showing current level, progress to next | 4h | 🟠 Medium |
-| 3A.16 | Victory condition | System to detect when you win | 3h | 🔴 High |
-
-*🎯 Expected result:* Fully playable game from start to finish with all core mechanics.
+| # | Descripció de la Tasca | Temps Estimat | Dificultat | Prioritat |
+|---|------------------------|---------------|------------|-----------|
+| **0** | **Aprendre Canvas Basics** - Estudiar tutorials MDN + YouTube sobre canvas API, com dibuixar formes bàsiques (rectangles, cercles), colors, detectar clicks a coordenades | **8h** (2h MDN + 1h vídeo + 2h pràctica + 3h experimentar) | **Alta** | **CRÍTICA** |
+| **1** | **Setup del projecte** - Crear estructura de carpetes, index.html amb element canvas, style.css bàsic, game.js, connectar tot correctament, inicialitzar Git repository | **2h** | **Baixa** | **Alta** |
+| **2** | **Canvas amb fons bàsic** - Canvas a pantalla completa o mida fixa, fons de color (cel fosc, verd, el que vulguis), centrat a la pàgina | **1h** | **Baixa** | **Alta** |
+| **3** | **Sistema de coordenades del mapa** - Definir mida total del mapa (ex: 3000x3000px), variables globals mapX/mapY per gestionar posició de la càmera/viewport | **2h** (1h codi + 1h investigar offset) | **Mitjana** | **Alta** |
+| **4** | **Dibuixar primer node de recurs (fusta)** - Funció drawResource(x, y, type), dibuixar cercle verd en posició fixa del mapa virtual, provar que es veu | **2h** | **Baixa-Mitjana** | **Alta** |
+| **5** | **Detectar clicks als recursos** - addEventListener('click') al canvas, calcular coordenades reals al mapa considerant offset càmera, detectar si click està dins del cercle d'un recurs | **4h** (2h implementar + 2h debug coordenades) | **Mitjana-Alta** | **CRÍTICA** |
+| **6** | **Contador de recursos** - Objecte JavaScript resources = {wood: 0, stone: 0, ...}, mostrar valors amb DOM (div fora del canvas), +1 quan fas click a un recurs | **2h** | **Baixa** | **Alta** |
+| **7** | **Dibuixar el Nexe/Déu al centre** - Rectangle o cercle gran al centre del mapa, color distintiu (porpra, negre, etc.), funció drawNexus(), és l'objectiu visual principal | **1h** | **Baixa** | **Alta** |
+| **8** | **Sistema "dipositar recursos" bàsic** - Botó DOM "Dipositar al Nexe", quan cliques resta els recursos que tens i suma punts (faithPoints), missatge feedback | **3h** (1h lògica + 1h investigar + 1h testejar) | **Mitjana** | **Alta** |
+| **9** | **Game Loop amb requestAnimationFrame** - Crear funció gameLoop() que es crida cada frame (~60 FPS), redibuixa tot el canvas constantment, base essencial per animacions | **4h** (2h aprendre requestAnimationFrame + 2h implementar) | **Mitjana-Alta** | **CRÍTICA** |
+| **10** | **Moviment de càmera amb drag** - Detectar mousedown + mousemove per arrossegar el mapa, actualitzar mapX/mapY segons moviment ratolí, mouseup per parar | **5h** (2h investigar + 3h implementar/debug) | **Alta** | **Mitjana** |
+| **11** | **Afegir més tipus de recursos** - Pedra (cercle gris), ferro (cercle marró fosc), or (cercle groc), posicionar-los en diferents zones del mapa per varietat | **2h** | **Baixa** | **Mitjana** |
+| **12** | **Panel lateral UI** - Crear div fix a la dreta de la pantalla amb llista de recursos actuals, punts totals, nivell, estil CSS decent | **3h** (1h HTML estructura + 2h CSS per fer-ho bonic) | **Mitjana** | **Mitjana** |
+| **13** | **Primera màquina: Extractor** - Botó "Comprar Extractor (cost: 10 punts)", crear objecte Machine {type, x, y, producing}, dibuixar rectangle o forma al mapa | **4h** (2h lògica compra + 2h renderitzar) | **Mitjana** | **Alta** |
+| **14** | **Sistema col·locar màquina al mapa** - Després de comprar, mode "placement", cursor canvia, click al mapa per col·locar, validar que no estigui sobre altre cosa | **5h** (3h lògica placement + 2h UX/feedback visual) | **Alta** | **Alta** |
+| **15** | **Extracció automàtica de màquines** - setInterval o lògica al gameLoop, cada X segons màquina extreu 1 recurs si està a prop d'un node de recurs corresponent | **4h** (2h lògica proximitat + 1h investigar + 1h debug) | **Mitjana-Alta** | **CRÍTICA** |
+| **16** | **Dibuixar cintes transportadores bàsiques** - Línia des de posició màquina fins al Nexe, funció drawConveyor(from, to), color diferent per veure-les | **2h** | **Baixa-Mitjana** | **Mitjana** |
+| **17** | **Animació recursos movent-se per cinta** - Crear objecte ResourceInTransit {x, y, targetX, targetY, type}, cada frame actualitzar posició cap al target, dibuixar al canvas | **8h** (3h dissenyar sistema + 4h implementar moviment + 1h debug) | **ALTA** | **Mitjana-Alta** |
+| **18** | **Recursos arriben al Nexe** - Detectar quan ResourceInTransit arriba a coordenades del Nexe, sumar punts automàticament, eliminar objecte, efecte visual opcional | **3h** (2h lògica + 1h testejar diferents casos) | **Mitjana** | **Alta** |
+| **19** | **Zoom in/out del mapa** - Event listener mousewheel, canviar variable zoomLevel, aplicar scale al context canvas, ajustar coordenades clicks | **4h** (2h investigar canvas scaling + 2h implementar) | **Mitjana-Alta** | **Baixa** |
+| **20** | **Sistema de grid/graella** - Dibuixar línies de grid al mapa (cada 50px per exemple), snap de màquines a grid, validar no overlap entre màquines | **3h** (1h dibuixar grid + 2h snap logic) | **Mitjana** | **Mitjana** |
+| **21** | **Més tipus de màquines** - Implementar Mina (extreu pedra/ferro), Processadora (combina 2 recursos per fer 1 nou), diferents costos i funcionalitats | **5h** (≈2-3h per cada màquina nova) | **Mitjana** | **Mitjana** |
+| **22** | **Sistema de nivells i progressió** - Variable playerLevel, acumular experiència, pujar nivell quan arribes a threshold, desbloquetjar màquines/recursos nous per nivell | **4h** (2h lògica XP + 2h UI mostrar nivell/barra) | **Mitjana** | **Alta** |
+| **23** | **Expansió progressiva del mapa** - Quan puges de nivell, augmentar límits mapWidth/mapHeight, fer aparèixer nous nodes de recursos a zones noves | **3h** (1h lògica expansió + 2h spawn recursos nous) | **Mitjana** | **Mitjana** |
+| **24** | **Treballadors/Robots automàtics** - Comprar robot (cost punts), objecte que es mou pel mapa (punt animat), detecta màquines trencades, va cap allà i les repara | **6h** (3h pathfinding/moviment + 3h lògica reparació) | **Alta** | **Baixa** |
+| **25** | **Màquines es poden trencar** - Random chance cada X temps una màquina "es trenca" (isBroken=true), canvia color (vermell), deixa de produir fins que es repari | **2h** | **Baixa-Mitjana** | **Mitjana** |
+| **26** | **Sistema del Déu - Diàlegs** - Escriure mínim 30 diàlegs diferents (sarcàstic, enfadat, content, etc.), sistema per mostrar-los (div flotant/modal), aleatoris quan diposites | **6h** (4h escriure diàlegs + 2h implementar UI diàlegs) | **Baixa** | **Alta** |
+| **27** | **Sistema humor dinàmic del Déu** - Variable godMood (calm, angry, playful, neutral), canvia segons tipus de recursos que li dones (gemmes afecten diferent), mood afecta bonificacions punts | **4h** (2h lògica mood + 2h testejar comportaments) | **Mitjana** | **Mitjana** |
+| **28** | **Events aleatoris** - Sistema random events amb setInterval, exemple: meteorit cau (animació), impacta zona, trenca màquines properes, deixa Meteor Fragments (valuós) | **5h** (2h sistema events + 3h animació/efecte meteorit) | **Mitjana-Alta** | **Baixa** |
+| **29** | **Sistema Save/Load amb localStorage** - Serialitzar tot l'estat del joc (màquines + posicions, recursos, nivell, etc.) a JSON, localStorage.setItem, botó Load que recupera tot | **6h** (3h implementar save/load + 2h testejar + 1h debug edge cases) | **Mitjana-Alta** | **Alta** |
+| **30** | **Auto-save periòdic** - setInterval cada 30-60 segons, cridar funció saveGame() automàticament, mostrar missatge temporal "Game Saved" | **2h** | **Baixa** | **Mitjana** |
+| **31** | **Tutorial inicial interactiu** - Overlay/modal que apareix primer cop, guia pas a pas: "Click aquí per recollir fusta", "Ara diposita al Nexe", "Compra primera màquina", etc. | **4h** (2h dissenyar flux tutorial + 2h implementar) | **Mitjana** | **Mitjana** |
+| **32** | **Millores visuals: Pixel art** - Crear sprites 16x16 (o 32x32) per cada recurs, màquines, Nexe amb Aseprite/Piskel, carregar imatges i reemplaçar formes bàsiques | **12h** (8h aprendre i fer sprites + 4h implementar al codi) | **Mitjana** (depèn experiència pixel art) | **BAIXA** |
+| **33** | **Animacions de màquines** - Sprite sheets per màquines funcionant (girant, fumejant), animar frame a frame al canvas, visual feedback que estan produint | **6h** (3h crear sprite sheets + 3h implementar animació) | **Alta** | **BAIXA** |
+| **34** | **Sistema de partícules i efectes** - Quan màquina extreu: mini partícules surten, quan robot repara: espurnes, click recurs: efecte visual, millora feedback | **4h** | **Mitjana** | **BAIXA** |
+| **35** | **So i música** - Buscar/crear efectes sonors (click, màquina funcionant, dipositar), música ambient, implementar amb Web Audio API o etiquetes audio | **8h** (4h buscar/fer sons + 4h implementar) | **Mitjana** | **MOLT BAIXA** |
+| **36** | **Optimització rendiment** - Si amb moltes màquines hi ha lag, implementar culling (no dibuixar fora viewport), optimitzar draw calls, object pooling per resources in transit | **4h** | **Alta** | **Variable** |
+| **37** | **Testing complet i ajustament** - Jugar intensivament, anotar tots els bugs, fer que amics/família provin, recollir feedback, ajustar dificultat/balanç del joc | **8h** | **Baixa** | **Alta** |
+| **38** | **Documentació del codi** - Comentar bé tot el codi JavaScript, escriure README.md explicant projecte i com jugar, documentar estructura de fitxers | **4h** | **Baixa** | **Alta** |
+| **39** | **Preparar presentació final** - Crear slides o vídeo demostració, preparar explicació oral pel professor, assajar, publicar a GitHub Pages | **4h** | **Baixa** | **Alta** |
 
 ---
 
-## 🚀 PHASE 3B: PRODUCTION BETA
-**Duration:** 4 weeks (Week 10-13)  
-**Total Hours:** 48h  
+## Resum per Nivell de Prioritat
 
-(*Tables formatted the same way as above, with priorities colored and descriptions clear.*)
+### 🔴 CRÍTICA (sense això el joc no funciona)
+**Tasques:** 0, 5, 9, 15  
+**Total:** 21 hores
+
+### 🟠 ALTA (joc mínim viable funcional)
+**Tasques:** 1, 2, 3, 4, 6, 7, 8, 13, 14, 18, 22, 26, 29, 37, 38, 39  
+**Total:** 67 hores
+
+### 🟡 MITJANA (profunditat i varietat)
+**Tasques:** 10, 11, 12, 16, 17, 19, 20, 21, 23, 25, 27, 30, 31  
+**Total:** 56 hores
+
+### 🟢 BAIXA (polish i nice-to-have)
+**Tasques:** 24, 28, 32, 33, 34, 36  
+**Total:** 42 hores
+
+### ⚪ MOLT BAIXA (només si sobra molt temps)
+**Tasques:** 35  
+**Total:** 8 hores
+
+---
+
+## Càlcul Total d'Hores
+
+| Categoria | Hores |
+|-----------|-------|
+| **CRÍTICA + ALTA** (Mínim viable) | **88h** |
+| **+ MITJANA** (Joc complet amb profunditat) | **144h** |
+| **+ BAIXA** (Joc polit i professional) | **186h** |
+| **+ MOLT BAIXA** (Amb tots els extres) | **194h** |
 
 ---
 
-## 🏁 PHASE 4: FINALIZATION AND DELIVERY
-**Duration:** 4 weeks (Week 14-17)  
-**Total Hours:** 47h  
+## Recomanació de Planning
 
-(*Tables formatted the same way as above, clear and readable.*)
+**Objectiu realista:** Arribar a **144 hores** (CRÍTICA + ALTA + MITJANA)
 
----
+Amb **15h/setmana** → **~10 setmanes** (2.5 mesos)  
+Amb **12h/setmana** → **~12 setmanes** (3 mesos)  
+Amb **10h/setmana** → **~14 setmanes** (3.5 mesos)
 
-## 📊 TOTAL SUMMARY PER PHASE
-
-| **Phase** | **Weeks** | **Estimated Hours** |
-|:--|:--:|:--:|
-| Phase 1: Planning | 2 | 25h |
-| Phase 2: Pre-production | 2 | 28h |
-| Phase 3A: Production Alpha | 5 | 62h |
-| Phase 3B: Production Beta | 4 | 48h |
-| Phase 4: Finalization | 4 | 47h |
-| **TOTAL PROJECT** | **17 weeks** | **210h** |
+Així tens marge pel polish (tasques BAIXA) si vas bé de temps! 🚀
 
 ---
+
+**Vols que et faci també un Gantt Chart o calendari setmanal detallat?**
