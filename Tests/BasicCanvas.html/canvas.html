@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>Basic Canvas</title>
+<style>
+body {
+  background-color: black;
+}
+#canvas {
+  width: 500px;
+  height: 350px;
+  background-color: white;
+  border: 1px solid grey;
+}
+</style>    
+</head>
+<body>
+    <canvas id="canvas">Hola</canvas>
+<script>
+function draw() {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "rgb(200 0 0)";
+  ctx.fillRect(10, 10, 50, 50);
+
+  ctx.fillStyle = "rgb(0 0 200 / 50%)";
+  ctx.fillRect(30, 30, 50, 50);
+}
+draw();
+</script>
+</body>
+</html>
