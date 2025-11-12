@@ -6,15 +6,13 @@ body {
   background-color: black;
 }
 #canvas {
-  width: 500px;
-  height: 350px;
   background-color: white;
   border: 1px solid grey;
 }
 </style>    
 </head>
 <body>
-    <canvas id="canvas">Hola</canvas>
+    <canvas id="canvas" width="800" height="500">Hola</canvas>
 <script>
 function draw() {
   const canvas = document.getElementById("canvas");
@@ -24,7 +22,7 @@ function draw() {
   ctx.fillRect(10, 10, 50, 50);
 
   ctx.fillStyle = "rgb(0 0 200 / 50%)";
-  ctx.fillRect(30, 30, 50, 50);
+  ctx.fillRect(400, 30, 50, 50);
 }
 draw();
 </script>
