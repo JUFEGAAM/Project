@@ -140,8 +140,7 @@ function accountForDPI() {
 
   ctx.scale(dpr, dpr);
 
-  ctx.translate(0.5, 0.5); /* Con esto conseguimos que las lineas se pinten en vez de en la coordenada 0 se pinten en la 0.5, esto ayuda a que las lineas se pinten de la manera correcta porque de la otra forma
-  llega un punto en el que se solapan ya que se quedan justo en medio de 2 coordenadas por ejemplo se queda entre la 10.5 y la 11.5 y lo que hace es pintar dos lineas juntas lo que hace que todas las lineas se vean mas gordas y borrosas, pero al pones esta simple variable se arregla. */
+  ctx.translate(0.5, 0.5); /* Con esto conseguimos que las lineas se pinten en vez de en la coordenada 0 se pinten en la 0.5, esto ayuda a que las lineas se pinten de la manera correcta porque de la otra forma llega un punto en el que se solapan ya que se quedan justo en medio de 2 coordenadas por ejemplo se queda entre la 10.5 y la 11.5 y lo que hace es pintar dos lineas juntas lo que hace que todas las lineas se vean mas gordas y borrosas, pero al pones esta simple variable se arregla. */
 
 // Ahora manteniendo el escalado para el dpr que toca le ponemos el tamaño real del canvas ya que sin esto se veria todo demasiado grande
   world.style.width = `${rect.width}px`;
@@ -152,4 +151,7 @@ drawGrid(1, 50, 50, "#000"); // Al mover aqui la funcion conseguimos que primero
 </script>
 ```
 
+Ahora lo que tenemos que hacer es añadir algo que arregle el ultimo problema para este primer reto de pintar una cuadricula, lo que pasa es que las lineas empiezan, se pintan correctamente respetando el tamaño y separacion hasta que llega al final y se cortan las cuadriculas cosa que queda muy mal, asi que habria que hacer que se ajuste correctamente por eso vamos a investigar como.
 
+Prueba:
+![Cuadricula mal dimensionada](./images/gridLines-misaligned.png)
