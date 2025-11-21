@@ -151,7 +151,5 @@ accountForDPI();
 drawGrid(1, 50, 50, "#000"); // Al mover aqui la funcion conseguimos que primero se ejecute la funcion accountForDPI que se encarga de obtener el DPI del monitor renderizando la pagina y ya despues se dibuja el grid, de la otra forma se corrompia y las lineas no se dibujaban
 </script>
 ```
-```
-```
 
 
