@@ -155,4 +155,4 @@ Ahora lo que tenemos que hacer es añadir algo que arregle el ultimo problema pa
 
 Prueba de las lineas mal posicionadas:
 
-<img src="./images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="500">
+<img src="./images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="300">
