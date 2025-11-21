@@ -90,3 +90,68 @@ function accountForDPI() {
 }
 accountForDPI();
 ```
+
+Vale, he identificado 2 problemas que hacian que el grid no se dibujase correctamente.
+
+Para empezar he cambiado el sitio donde estaba llamando a la funcion `drawGrid` haciendo que primero se llame a la funcion `accountForDPI` y luego se dibuje el grid con `drawGrid`. De esta forma conseguimos que si se dibuje el grid ya que antes no lo hacia porque por alguna razon si primero se pintaba logicamente consiguiendo el DPI y luego se pintaba fisicamente con la funcion `drawGrid` se quedaba en blanco
+
+Luego me he dado cuenta que las lineas se veian como demasiado gruesas y algo borrosas, resulta que si tu pintas las lineas desde el 0 0 cada surge un problema matematico entre el canvas y tu monitor, si la instruccion es pinta una linea en la coordenada 10 10 si fuera por el canvas estaria bien pero el problema esta en que los monitores estan formados por pixeles que al final son "bombillitas" que se encienden y apagan pero no pueden encenderse a medias por lo tanto la logica que se aplica es pintar la linea en la coordenada 9.5 y en la 10.5 aplicando algo que se llama Anti-aliasing, hace que las 2 lineas que quieren formar 1 linea negra se pinten con un gris eso hace que sea mas gruesa y mas borrosa ya que no es negro puro. Con este cambio de contexto llamado `ctx.translate(0.5, 0.5);` conseguimos que todo se empieze a dibujar en el 0.5 asi cuando esta intentando pintar en la coordenada 10.5 lo que va a hacer es pintar desde la 10 a la 11 y de esta forma no se ve borroso porque son 100% negras y estan en el mismo, antes se pintaban a cada lado de la linea divisoria invisible que existe y eso generaba ese problema.
+
+**El codigo demomento quedaria asi:**
+
+```javascript
+<script>
+  let world = document.getElementById("world"); // Creamos el valor "world" que apunta al ID del canvas
+  const ctx = world.getContext("2d"); // Le decimos que el contexto del canvas queremos que sea en 2D
+
+  function drawGrid(lineWidth, cellWidth, cellHeight, color) {
+  // Propiedas de las lineas
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+
+  // Obtener tamaño
+  let width = world.width;
+  let height = world.height;
+
+  // Dibujar lineas verticales
+  for (let x = 0; x <= width; x += cellWidth) {
+    ctx.beginPath(); // Desde aqui se dibujara la linea
+    ctx.moveTo(x, 0); // Movemos el punto de inicio al 0 en los ejes x y
+    ctx.lineTo(x, height); // Nos quedamos en la x y vamos hasta donde le pongamos al valor "height"
+    ctx.stroke(); // Con esto hacemos que cada vez que se dibuja una linea tenga la separacion que hemos puesto  en el valor "cellWidth"
+  }
+
+  // Dibujar lineas horizontales
+  for (let y = 0; y <= height; y += cellHeight) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+}
+// Antiguamente aqui estaba la funcion drawGrid que daba problemas
+function accountForDPI() {
+  const dpr = window.devicePixelRatio || 1; // Con esto conseguimos cuantos pixeles se dibujan por cada pixel fisico, si no se obtiene nada el valor sera 1
+  const rect = world.getBoundingClientRect(); // Conseguimos el tamaño del canvas en CSS porque al parecer el tamaño que vemos puede ser diferente al registrado por CSS
+
+// Con esto hacemos que el tamaño interno del canvas se adapte a el valor que obtengamos del dpr de cada pantalla
+  world.width = rect.width * dpr;
+  world.height = rect.height * dpr;
+
+  ctx.scale(dpr, dpr);
+
+  ctx.translate(0.5, 0.5); /* Con esto conseguimos que las lineas se pinten en vez de en la coordenada 0 se pinten en la 0.5, esto ayuda a que las lineas se pinten de la manera correcta porque de la otra forma
+  llega un punto en el que se solapan ya que se quedan justo en medio de 2 coordenadas por ejemplo se queda entre la 10.5 y la 11.5 y lo que hace es pintar dos lineas juntas lo que hace que todas las lineas se vean mas gordas y borrosas, pero al pones esta simple variable se arregla. */
+
+// Ahora manteniendo el escalado para el dpr que toca le ponemos el tamaño real del canvas ya que sin esto se veria todo demasiado grande
+  world.style.width = `${rect.width}px`;
+  world.style.height = `${rect.height}px`;
+}
+accountForDPI();
+drawGrid(1, 50, 50, "#000"); // Al mover aqui la funcion conseguimos que primero se ejecute la funcion accountForDPI que se encarga de obtener el DPI del monitor renderizando la pagina y ya despues se dibuja el grid, de la otra forma se corrompia y las lineas no se dibujaban
+</script>
+```
+```
+```
+
+
