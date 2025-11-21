@@ -153,6 +153,6 @@ drawGrid(1, 50, 50, "#000"); // Al mover aqui la funcion conseguimos que primero
 
 Ahora lo que tenemos que hacer es añadir algo que arregle el ultimo problema para este primer reto de pintar una cuadricula, lo que pasa es que las lineas empiezan, se pintan correctamente respetando el tamaño y separacion hasta que llega al final y se cortan las cuadriculas cosa que queda muy mal, asi que habria que hacer que se ajuste correctamente por eso vamos a investigar como.
 
-Prueba:
+Prueba de las lineas mal posicionadas:
 
-<img src="./images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="300">
+<img src="./images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="500">
