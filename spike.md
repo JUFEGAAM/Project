@@ -156,3 +156,23 @@ Ahora lo que tenemos que hacer es añadir algo que arregle el ultimo problema pa
 Prueba de las lineas mal posicionadas:
 
 <img src="./images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="300">
+
+Ok, after some time researching about this problem i've found what was making those rows and columns look cutted lets take a look:
+
+1. First we have something that wasn't the main problem but could make me go crazy if i didnt find out of it, its the css declaration "flex-shrink", by default is set to "1" which translates to "true" and that makes the grid to shrink when properties of the browser change like opening the browser console or zooming in or out, with "flex-shrink: 0;" we make the grid unshrinkable so it wont affect to our grid rows and columns.
+
+```css
+#world {
+  border: 2px solid black;
+  flex-shrink: 0; /*Makes the grid unshrinkable by the browser"*/
+  }
+```
+
+2. Second we deleted the function "world.getBoundingClientRect()", this function was calculating the size of the canvas at that moment so if you had zoom on your browser or just by the flexbox, the browser would get the result with decimals so you wont gent 700 but 699.6 or something like that, so what i made was create 2 const that where getting the widht and height directly from the canvas properties so now its a fixed number.
+
+```javascript
+const WORLD_WIDTH = parseInt(world.getAttribute("width"));
+const WORLD_HEIGHT = parseInt(world.getAttribute("height"));
+```
+
+I added these new values to all the places where i was calling width and height.
