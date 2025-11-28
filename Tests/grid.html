@@ -12,7 +12,7 @@
   }
 
   #world {
-    border: 1px solid black;
+    border: 2px solid black;
     flex-shrink: 0; /*Makes the grid unshrinkable by the browser"*/
   }
 </style>    
@@ -60,15 +60,12 @@ function accountForDPI() {
 
   ctx.scale(dpr, dpr);
 
-  ctx.translate(0.5, 0.5); /* Con esto conseguimos que las lineas se pinten en vez de en la coordenada 0 se pinten en la 0.5, esto ayuda a que las lineas se pinten de la manera correcta porque de la otra forma
-  llega un punto en el que se solapan ya que se quedan justo en medio de 2 coordenadas por ejemplo se queda entre la 10.5 y la 11.5 y lo que hace es pintar dos lineas juntas lo que hace que todas las lineas se vean mas gordas y borrosas, pero al pones esta simple variable se arregla. */
-
 // Ahora manteniendo el escalado para el dpr que toca le ponemos el tamaño real del canvas ya que sin esto se veria todo demasiado grande
   world.style.width = `${WORLD_WIDTH}px`;
   world.style.height = `${WORLD_HEIGHT}px`;
 }
 accountForDPI();
-drawGrid(1, 50, 50, "#000"); // Al mover aqui la funcion conseguimos que primero se ejecute la funcion accountForDPI que se encarga de obtener el DPI del monitor renderizando la pagina y ya despues se dibuja el grid, de la otra forma se corrompia y las lineas no se dibujaban
+drawGrid(2, 25, 25, "#000"); // Al mover aqui la funcion conseguimos que primero se ejecute la funcion accountForDPI que se encarga de obtener el DPI del monitor renderizando la pagina y ya despues se dibuja el grid, de la otra forma se corrompia y las lineas no se dibujaban
 </script>
 </body>
 </html>
