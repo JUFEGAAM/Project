@@ -180,7 +180,9 @@ I added these new values to all the places where i was calling width and height.
 Ok now it's almost perfect but now the variable we added before, the one that made so the starting point wasnt 0 but 0.5, its making the grid to be displaced 0.5 in both x and y axes so now i tried deleting that and now i finally got the PERFECT Grid.
 
 Grid with `ctx.translate(0.5, 0.5);`:
+
 <img src="./images/Starting-at-0.5.png" alt="Grid image with starting point at 0.5 in x and y axes" width="300">
 
 Grid without `ctx.translate(0.5, 0.5);`:
+
 <img src="./images/Full-Perfect-Drawn-Grid.png" alt="The Perfect Square Grid" width="300">
