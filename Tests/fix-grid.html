@@ -1,0 +1,85 @@
+<html>
+<head>
+    <title>Grid Test Fixed</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+  }
+
+  #world {
+    border: 2px solid black;
+    background-color: white;
+    /* Esto evita que el canvas colapse antes de que cargue el JS */
+    display: block; 
+  }
+</style>    
+</head>
+<body>
+    <canvas id="world"></canvas>
+<script>
+  const world = document.getElementById("world");
+  const ctx = world.getContext("2d");
+
+  // 1. DEFINIMOS LA VERDAD ABSOLUTA: El tamaño que TÚ quieres que tenga el grid.
+  const LOGICAL_WIDTH = 700;
+  const LOGICAL_HEIGHT = 700;
+
+  function setupCanvas() {
+    // Obtenemos el DPR (en tu caso será 1 por tu config de Hyprland, pero esto lo hace compatible con todo)
+    const dpr = window.devicePixelRatio || 1;
+
+    // 2. AJUSTE FÍSICO (Buffer): Multiplicamos por DPR para la nitidez
+    // Usamos Math.floor o Math.ceil para evitar decimales si alguna vez cambias el escalado
+    world.width = Math.floor(LOGICAL_WIDTH * dpr);
+    world.height = Math.floor(LOGICAL_HEIGHT * dpr);
+
+    // 3. AJUSTE VISUAL (CSS): Forzamos que ocupe 700px en pantalla
+    world.style.width = `${LOGICAL_WIDTH}px`;
+    world.style.height = `${LOGICAL_HEIGHT}px`;
+
+    // 4. ESCALADO DEL CONTEXTO:
+    // Esto hace que cuando dibujes en "50", el canvas sepa que son "50 pixeles lógicos"
+    ctx.scale(dpr, dpr);
+    
+    // 5. EL FIX DE LAS LÍNEAS BORROSAS (0.5px)
+    // Solo aplicamos esto si las líneas son de 1px de grosor.
+    ctx.translate(0.5, 0.5);
+  }
+
+  function drawGrid(lineWidth, cellWidth, cellHeight, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+
+    // AQUÍ ESTABA EL OTRO ERROR GRANDE:
+    // Antes usabas "world.width". Si DPR es 1, world.width es 700.
+    // Pero si alguna vez pones DPR 2, world.width sería 1400.
+    // Al tener ctx.scale activo, no debes usar el tamaño físico, sino el LÓGICO.
+    
+    // Usamos LOGICAL_WIDTH (700) para el bucle
+    for (let x = 0; x <= LOGICAL_WIDTH; x += cellWidth) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, LOGICAL_HEIGHT);
+      ctx.stroke();
+    }
+
+    for (let y = 0; y <= LOGICAL_HEIGHT; y += cellHeight) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(LOGICAL_WIDTH, y);
+      ctx.stroke();
+    }
+  }
+
+  // Ejecutamos en orden
+  setupCanvas();
+  drawGrid(1, 50, 50, "#000");
+
+</script>
+</body>
+</html>
