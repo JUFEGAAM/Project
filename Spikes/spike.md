@@ -155,7 +155,7 @@ Now what we have to do is add something that fixes the last problem for this fir
 
 Proof of misaligned lines:
 
-<img src="./images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="300">
+<img src="../images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="300">
 
 Ok, after some time researching about this problem i've found what was making those rows and columns look cutted lets take a look:
 
@@ -181,8 +181,8 @@ Ok now it's almost perfect but now the variable we added before, the one that ma
 
 Grid with `ctx.translate(0.5, 0.5)`:
 
-<img src="./images/Starting-at-0.5.png" alt="Grid image with starting point at 0.5 in x and y axes" width="300">
+<img src="../images/Starting-at-0.5.png" alt="Grid image with starting point at 0.5 in x and y axes" width="300">
 
 Grid without `ctx.translate(0.5, 0.5)`:
 
-<img src="./images/Full-Perfect-Drawn-Grid.png" alt="The Perfect Square Grid" width="300">
+<img src="../images/Full-Perfect-Drawn-Grid.png" alt="The Perfect Square Grid" width="300">
