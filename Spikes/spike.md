@@ -1,67 +1,67 @@
-# Proyecto
+# Project
 
-Voy a hacer un "spike" con todas las cosas que quiero que mi juego tenga, la idea es pensar por ejemplo: 
-- *Quiero un mundo por el que me pueda mover y que tenga recursos.
-Pues para hacer eso pensare que necesito ya sea como hacer que se muestre solo una parte del mapa y que al moverme vaya apareciendo lo demas o como hacer que se dibujen esos recursos fijos en una coordenada y asi tendre una base de la cual partir con las cosas que se que funcionan y cumplen mis necesidades.*
+I'm gonna do a "spike" with all the things I want my game to have. The idea is to think like: 
+- *I want a world where I can move around and that has resources.
+So to do that I'll think that I need either a way to show only a part of the map and make the rest appear as I move, or how to make those fixed resources draw at a coordinate, and that way I'll have a base to start from with things I know work and meet my needs.*
 
-## Mundo
+## World
 
-#### Como hago que el mundo tenga un tamaño pero solo muestre una parte para dar esa sensacion de que estas en un mundo por el cual puedes moverte y encontrar cosas?
+#### How do I make the world have a size but only show a part to give that feeling that you are in a world where you can move and find things?
 
-Vale, primeramente creo que lo que mas se adapta a lo que quiero es un "canvas" es un elemento de html que se usa para pintar graficos, para ello necesitas tambien JavaScript que es el encargado de pintar las cosas que quieres.
+Ok, first I think what fits best is a "canvas", it's an html element used to paint graphics, for that you also need JavaScript which is in charge of painting the things you want.
 
-1. Primero creo el canvas con **`<canvas></canvas>`**
-2. Y le doy los parametros necesarios para empezar a configurarlo con JavaScript (importante el ID y declarar el width y el height si no pondra los default que es 300x150).
+1. First I create the canvas with **`<canvas></canvas>`**
+2. And I give it the necessary parameters to start configuring it with JavaScript (important the ID and declaring the width and height, otherwise it puts the default ones which is 300x150).
 
-**Quedaria asi:**
+**It would look like this:**
 ```html
 <canvas id="world" height="400" width="800"></canvas>
 ```
 
-***Importante declarar el width y el height en el elemento `<canvas>` porque si lo haces con CSS dara problemas ha sido uno de los primeros errores que me he encontrado
+***Important to declare the width and height in the `<canvas>` element because if you do it with CSS it will give problems, it was one of the first errors I encountered.
 
-Ahora hay varias cosas que serian interesantes implementar para que el mundo tenga mas sentido que un rectangulo en blanco. Por ejemplo empezaria por hacer que el mundo tenga un grid basicamente recuadros de una medida fija como un tablero de ajedrez que ayudaran a diferenciar las partes del mapa ya que moverte en un fondo blanco digamos que es como si no hicieras nada, despues estaria bien pintar cuadrados o cualquier figura sencilla que demomento seran las menas de recursos o arboles por ejemplo y como ultimo habria que hacer que nos podamos mover por el mundo que hemos creado asi que vamos paso por paso:
+Now there are several things that would be interesting to implement so the world makes more sense than just a blank rectangle. For example I would start by making the world have a grid, basically boxes of a fixed size like a chess board that will help differentiate the parts of the map since moving on a white background is kinda like doing nothing. Then it would be good to paint squares or any simple shape that for now will be the resource ores or trees for example, and lastly make it so we can move around the world we created, so let's go step by step:
 
-### Cuadricula del mundo (Grid)
+### World Grid
 
-Vale para empezar tendriamos que hacer la configuracion inicial del canvas como ya he dicho antes y a partir de ahi seguiremos con JavaScript:
+Ok so to start we would have to do the initial canvas config like I said before and from there we continue with JavaScript:
 
 ```html
 <canvas id="world" height="500" width="500"></canvas>
 ```
 
-Ahora no veremos nada porque el canvas esta en blanco por defecto, ahora pasamos con el JavaScript:
+Now we won't see anything because the canvas is blank by default, now let's go with the JavaScript:
 
-primero le damos los parametros iniciales para que identifique el canvas y entienda que queremos que pinte cosas en 2D:
+First we give it the initial parameters so it identifies the canvas and understands that we want it to paint things in 2D:
   
 ```html
 <script>
-  let world = document.getElementByID("world"); // Creamos el valor "world" que apunta al ID del canvas
-  const ctx = world.getContext("2d"); // Le decimos que el contexto del canvas queremos que sea en 2D
+  let world = document.getElementByID("world"); // We create the value "world" that points to the ID of the canvas
+  const ctx = world.getContext("2d"); // We tell it that we want the canvas context to be 2D
 </script>
 ```
 
-Con esta funcion que vamos hacer lo que conseguimos es ya crear nuestra primer cuadricula, basicamente estamos diciendole desde donde queremos que dibuje las lineas, con que espacio y que tamaño con tal de que formemos una cuadricula en todo el canvas.
+With this function we are gonna do, what we achieve is creating our first grid, basically we are telling it where we want it to draw the lines from, with what spacing and what size so we form a grid across the whole canvas.
 
 ```javascript
 function drawGrid(lineWidth, cellWidth, cellHeight, color) {
-  // Propiedas de las lineas
+  // Line properties
   ctx.strokeStyle = color;
   ctx.lineWidth = lineWidth;
 
-  // Obtener tamaño
+  // Get size
   let width = world.width;
   let height = world.height;
 
-  // Dibujar lineas verticales
+  // Draw vertical lines
   for (let x = 0; x <= width; x += cellWidth) {
-    ctx.beginPath(); // Desde aqui se dibujara la linea
-    ctx.moveTo(x, 0); // Movemos el punto de inicio al 0 en los ejes x y
-    ctx.lineTo(x, height); // Nos quedamos en la x y vamos hasta donde le pongamos al valor "height"
-    ctx.stroke(); // Con esto hacemos que cada vez que se dibuja una linea tenga la separacion que hemos puesto  en el valor "cellWidth"
+    ctx.beginPath(); // From here the line will be drawn
+    ctx.moveTo(x, 0); // We move the starting point to 0 on the x and y axes
+    ctx.lineTo(x, height); // We stay on x and go up to where we put the "height" value
+    ctx.stroke(); // With this we make sure that every time a line is drawn it has the separation we put in the "cellWidth" value
   }
 
-  // Dibujar lineas horizontales
+  // Draw horizontal lines
   for (let y = 0; y <= height; y += cellHeight) {
     ctx.beginPath();
     ctx.moveTo(y, 0);
@@ -72,56 +72,56 @@ function drawGrid(lineWidth, cellWidth, cellHeight, color) {
 drawGrid(1, 20, 20, "#000");
 ```
 
-Bueno una vez hemos hecho esto ya vemos nuestra primera cuadricula pero hay un problema, si te fijas por alguna razon las lineas se ven borrosas, eso se debe a que el elemento canvas de por si usa un ajuste de DPI (pixeles por pulgada) muy bajo que para pantallas antiguas seria perfecto pero hoy en dia las pantallas son mucho mas potentes. Lo que hacen las pantallas se llama Down Sampling y es lo que pasa cuando una pantalla con una resolucion mayor renderiza algo con unos graficos muy bajos, para solucionar eso hacemos esto.
+Well once we've done this we already see our first grid but there is a problem, if you look closely for some reason the lines look blurry, that is because the canvas element itself uses a very low DPI (dots per inch) setting which for old screens would be perfect but nowadays screens are much more powerful. What screens do is called Down Sampling and it's what happens when a screen with a higher resolution renders something with very low graphics, to fix that we do this.
 
 ```javascript
 function accountForDPI() {
-  const dpr = window.devicePixelRatio || 1; // Con esto conseguimos cuantos pixeles se dibujan por cada pixel fisico, si no se obtiene nada el valor sera 1
-  const rect = world.getBoundingClientRect(); // Conseguimos el tamaño del canvas en CSS porque al parecer el tamaño que vemos puede ser diferente al registrado por CSS
+  const dpr = window.devicePixelRatio || 1; // With this we get how many pixels are drawn for each physical pixel, if nothing is obtained the value will be 1
+  const rect = world.getBoundingClientRect(); // We get the canvas size in CSS because apparently the size we see can be different from the one registered by CSS
 
-// Con esto hacemos que el tamaño interno del canvas se adapte a el valor que obtengamos del dpr de cada pantalla
+// With this we make the internal size of the canvas adapt to the value we get from the dpr of each screen
   world.width = rect.width * dpr;
   world.height = rect.height * dpr;
   ctx.scale(dpr, dpr);
 
-// Ahora manteniendo el escalado para el dpr que toca le ponemos el tamaño real del canvas ya que sin esto se veria todo demasiado grande
+// Now keeping the scaling for the dpr that touches it we put the real size of the canvas since without this everything would look too big
   world.style.width = `${rect.width}px`;
   world.style.height = `${rect.height}px`;
 }
 accountForDPI();
 ```
 
-Vale, he identificado 2 problemas que hacian que el grid no se dibujase correctamente.
+Ok, I've identified 2 problems that were making the grid not draw correctly.
 
-Para empezar he cambiado el sitio donde estaba llamando a la funcion `drawGrid` haciendo que primero se llame a la funcion `accountForDPI` y luego se dibuje el grid con `drawGrid`. De esta forma conseguimos que si se dibuje el grid ya que antes no lo hacia porque por alguna razon si primero se pintaba logicamente consiguiendo el DPI y luego se pintaba fisicamente con la funcion `drawGrid` se quedaba en blanco
+To start I changed the place where I was calling the `drawGrid` function making it so `accountForDPI` is called first and then the grid is drawn with `drawGrid`. This way we manage to actually draw the grid because before it wasn't doing it because for some reason if logically getting the DPI was painted first and then physically painted with the `drawGrid` function it stayed blank.
 
-Luego me he dado cuenta que las lineas se veian como demasiado gruesas y algo borrosas, resulta que si tu pintas las lineas desde el 0 0 cada surge un problema matematico entre el canvas y tu monitor, si la instruccion es pinta una linea en la coordenada 10 10 si fuera por el canvas estaria bien pero el problema esta en que los monitores estan formados por pixeles que al final son "bombillitas" que se encienden y apagan pero no pueden encenderse a medias por lo tanto la logica que se aplica es pintar la linea en la coordenada 9.5 y en la 10.5 aplicando algo que se llama Anti-aliasing, hace que las 2 lineas que quieren formar 1 linea negra se pinten con un gris eso hace que sea mas gruesa y mas borrosa ya que no es negro puro. Con este cambio de contexto llamado `ctx.translate(0.5, 0.5);` conseguimos que todo se empieze a dibujar en el 0.5 asi cuando esta intentando pintar en la coordenada 10.5 lo que va a hacer es pintar desde la 10 a la 11 y de esta forma no se ve borroso porque son 100% negras y estan en el mismo, antes se pintaban a cada lado de la linea divisoria invisible que existe y eso generaba ese problema.
+Then I realized that the lines looked like too thick and kinda blurry, turns out if you paint the lines from 0 0 a mathematical problem comes up between the canvas and your monitor, if the instruction is paint a line at coordinate 10 10 if it were for the canvas it would be fine but the problem is that monitors are made of pixels that in the end are "little lightbulbs" that turn on and off but can't turn on halfway so the logic applied is painting the line at coordinate 9.5 and at 10.5 applying something called Anti-aliasing, it makes the 2 lines that want to form 1 black line paint with a grey so that makes it thicker and blurrier since it's not pure black. With this context change called `ctx.translate(0.5, 0.5);` we get everything to start drawing at 0.5 so when it's trying to paint at coordinate 10.5 what it's gonna do is paint from 10 to 11 and this way it doesn't look blurry because they are 100% black and are in the same place, before they were painted on each side of the invisible dividing line that exists and that generated that problem.
 
-**El codigo demomento quedaria asi:**
+**The code for now would look like this:**
 
 ```javascript
 <script>
-  let world = document.getElementById("world"); // Creamos el valor "world" que apunta al ID del canvas
-  const ctx = world.getContext("2d"); // Le decimos que el contexto del canvas queremos que sea en 2D
+  let world = document.getElementById("world"); // We create the value "world" that points to the ID of the canvas
+  const ctx = world.getContext("2d"); // We tell it that we want the canvas context to be 2D
 
   function drawGrid(lineWidth, cellWidth, cellHeight, color) {
-  // Propiedas de las lineas
+  // Line properties
   ctx.strokeStyle = color;
   ctx.lineWidth = lineWidth;
 
-  // Obtener tamaño
+  // Get size
   let width = world.width;
   let height = world.height;
 
-  // Dibujar lineas verticales
+  // Draw vertical lines
   for (let x = 0; x <= width; x += cellWidth) {
-    ctx.beginPath(); // Desde aqui se dibujara la linea
-    ctx.moveTo(x, 0); // Movemos el punto de inicio al 0 en los ejes x y
-    ctx.lineTo(x, height); // Nos quedamos en la x y vamos hasta donde le pongamos al valor "height"
-    ctx.stroke(); // Con esto hacemos que cada vez que se dibuja una linea tenga la separacion que hemos puesto  en el valor "cellWidth"
+    ctx.beginPath(); // From here the line will be drawn
+    ctx.moveTo(x, 0); // We move the starting point to 0 on the x and y axes
+    ctx.lineTo(x, height); // We stay on x and go up to where we put the "height" value
+    ctx.stroke(); // With this we make sure that every time a line is drawn it has the separation we put in the "cellWidth" value
   }
 
-  // Dibujar lineas horizontales
+  // Draw horizontal lines
   for (let y = 0; y <= height; y += cellHeight) {
     ctx.beginPath();
     ctx.moveTo(0, y);
@@ -129,31 +129,31 @@ Luego me he dado cuenta que las lineas se veian como demasiado gruesas y algo bo
     ctx.stroke();
   }
 }
-// Antiguamente aqui estaba la funcion drawGrid que daba problemas
+// Formerly here was the drawGrid function that gave problems
 function accountForDPI() {
-  const dpr = window.devicePixelRatio || 1; // Con esto conseguimos cuantos pixeles se dibujan por cada pixel fisico, si no se obtiene nada el valor sera 1
-  const rect = world.getBoundingClientRect(); // Conseguimos el tamaño del canvas en CSS porque al parecer el tamaño que vemos puede ser diferente al registrado por CSS
+  const dpr = window.devicePixelRatio || 1; // With this we get how many pixels are drawn for each physical pixel, if nothing is obtained the value will be 1
+  const rect = world.getBoundingClientRect(); // We get the canvas size in CSS because apparently the size we see can be different from the one registered by CSS
 
-// Con esto hacemos que el tamaño interno del canvas se adapte a el valor que obtengamos del dpr de cada pantalla
+// With this we make the internal size of the canvas adapt to the value we get from the dpr of each screen
   world.width = rect.width * dpr;
   world.height = rect.height * dpr;
 
   ctx.scale(dpr, dpr);
 
-  ctx.translate(0.5, 0.5); /* Con esto conseguimos que las lineas se pinten en vez de en la coordenada 0 se pinten en la 0.5, esto ayuda a que las lineas se pinten de la manera correcta porque de la otra forma llega un punto en el que se solapan ya que se quedan justo en medio de 2 coordenadas por ejemplo se queda entre la 10.5 y la 11.5 y lo que hace es pintar dos lineas juntas lo que hace que todas las lineas se vean mas gordas y borrosas, pero al pones esta simple variable se arregla. */
+  ctx.translate(0.5, 0.5); /* With this we get the lines to paint at coordinate 0.5 instead of 0, this helps the lines paint the correct way because otherwise there comes a point where they overlap since they stay right in the middle of 2 coordinates for example it stays between 10.5 and 11.5 and what it does is paint two lines together which makes all lines look fatter and blurrier, but putting this simple variable fixes it. */
 
-// Ahora manteniendo el escalado para el dpr que toca le ponemos el tamaño real del canvas ya que sin esto se veria todo demasiado grande
+// Now keeping the scaling for the dpr that touches it we put the real size of the canvas since without this everything would look too big
   world.style.width = `${rect.width}px`;
   world.style.height = `${rect.height}px`;
 }
 accountForDPI();
-drawGrid(1, 50, 50, "#000"); // Al mover aqui la funcion conseguimos que primero se ejecute la funcion accountForDPI que se encarga de obtener el DPI del monitor renderizando la pagina y ya despues se dibuja el grid, de la otra forma se corrompia y las lineas no se dibujaban
+drawGrid(1, 50, 50, "#000"); // By moving the function here we get the accountForDPI function to run first which is in charge of getting the monitor DPI rendering the page and then the grid is drawn, otherwise it corrupted and lines were not drawn
 </script>
 ```
 
-Ahora lo que tenemos que hacer es añadir algo que arregle el ultimo problema para este primer reto de pintar una cuadricula, lo que pasa es que las lineas empiezan, se pintan correctamente respetando el tamaño y separacion hasta que llega al final y se cortan las cuadriculas cosa que queda muy mal, asi que habria que hacer que se ajuste correctamente por eso vamos a investigar como.
+Now what we have to do is add something that fixes the last problem for this first challenge of painting a grid, what happens is that the lines start, paint correctly respecting size and separation until it reaches the end and the grid boxes get cut off which looks really bad, so we would have to make it adjust correctly that's why we are going to investigate how.
 
-Prueba de las lineas mal posicionadas:
+Proof of misaligned lines:
 
 <img src="./images/gridLines-misaligned.png" alt="Grid image with lines misaligned" width="300">
 
