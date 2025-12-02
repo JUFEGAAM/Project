@@ -13,36 +13,36 @@
 
   #world {
     border: 2px solid black;
-    flex-shrink: 0; /*Makes the grid unshrinkable by the browser"*/
+    flex-shrink: 0; /*Makes the grid unshrinkable by the browser*/
   }
 </style>    
 </head>
 <body>
     <canvas id="world" height="700" width="700"></canvas>
 <script>
-  let world = document.getElementById("world"); // Creamos el valor "world" que apunta al ID del canvas
-  const ctx = world.getContext("2d"); // Le decimos que el contexto del canvas queremos que sea en 2D
+  let world = document.getElementById("world"); // We create the "world" variable that points to the canvas ID
+  const ctx = world.getContext("2d"); // We tell it that we want the canvas context to be 2D
   const WORLD_WIDTH = parseInt(world.getAttribute("width"));
   const WORLD_HEIGHT = parseInt(world.getAttribute("height"));
 
   function drawGrid(lineWidth, cellWidth, cellHeight, color) {
-  // Propiedas de las lineas
+  // Line properties
   ctx.strokeStyle = color;
   ctx.lineWidth = lineWidth;
 
-  // Obtener tamaño
+  // Get size
   let width = WORLD_WIDTH;
   let height = WORLD_HEIGHT;
 
-  // Dibujar lineas verticales
+  // Draw vertical lines
   for (let x = 0; x <= width; x += cellWidth) {
-    ctx.beginPath(); // Desde aqui se dibujara la linea
-    ctx.moveTo(x, 0); // Movemos el punto de inicio al 0 en los ejes x y
-    ctx.lineTo(x, height); // Nos quedamos en la x y vamos hasta donde le pongamos al valor "height"
-    ctx.stroke(); // Con esto hacemos que cada vez que se dibuja una linea tenga la separacion que hemos puesto  en el valor "cellWidth"
+    ctx.beginPath(); // The line will be drawn from here
+    ctx.moveTo(x, 0); // Move the starting point to 0 on the x and y axes
+    ctx.lineTo(x, height); // We stay on x and go up to the value set in "height"
+    ctx.stroke(); // This ensures that every drawn line has the spacing set in "cellWidth"
   }
 
-  // Dibujar lineas horizontales
+  // Draw horizontal lines
   for (let y = 0; y <= height; y += cellHeight) {
     ctx.beginPath();
     ctx.moveTo(0, y);
@@ -50,22 +50,22 @@
     ctx.stroke();
   }
 }
-// Antiguamente aqui estaba la funcion drawGrid que daba problemas
+// Formerly, the drawGrid function was here, which caused problems
 function accountForDPI() {
-  const dpr = window.devicePixelRatio || 1; // Con esto conseguimos cuantos pixeles se dibujan por cada pixel fisico, si no se obtiene nada el valor sera 1
+  const dpr = window.devicePixelRatio || 1; // This gets us how many pixels are drawn per physical pixel; if nothing is returned, the value is 1
 
-// Con esto hacemos que el tamaño interno del canvas se adapte a el valor que obtengamos del dpr de cada pantalla
+// This adapts the internal canvas size to the value obtained from each screen's DPR
   world.width = WORLD_WIDTH * dpr;
   world.height = WORLD_HEIGHT * dpr;
 
   ctx.scale(dpr, dpr);
 
-// Ahora manteniendo el escalado para el dpr que toca le ponemos el tamaño real del canvas ya que sin esto se veria todo demasiado grande
+// Now, keeping the scaling for the appropriate DPR, we set the real canvas size, otherwise everything would look too big
   world.style.width = `${WORLD_WIDTH}px`;
   world.style.height = `${WORLD_HEIGHT}px`;
 }
 accountForDPI();
-drawGrid(2, 25, 25, "#000"); // Al mover aqui la funcion conseguimos que primero se ejecute la funcion accountForDPI que se encarga de obtener el DPI del monitor renderizando la pagina y ya despues se dibuja el grid, de la otra forma se corrompia y las lineas no se dibujaban
+drawGrid(2, 25, 25, "#000"); // By moving the function here, we ensure accountForDPI runs first (getting the monitor DPI by rendering the page) and then the grid is drawn. Otherwise, it corrupted and lines weren't drawn
 </script>
 </body>
 </html>
