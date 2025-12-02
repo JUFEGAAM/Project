@@ -18,7 +18,7 @@ Ok, first I think what fits best is a "canvas", it's an html element used to pai
 <canvas id="world" height="400" width="800"></canvas>
 ```
 
-***Important to declare the width and height in the `<canvas>` element because if you do it with CSS it will give problems, it was one of the first errors I encountered.
+***Important to declare the width and height in the `<canvas>` element because if you do it with CSS it will give problems, it was one of the first errors I encountered.***
 
 Now there are several things that would be interesting to implement so the world makes more sense than just a blank rectangle. For example I would start by making the world have a grid, basically boxes of a fixed size like a chess board that will help differentiate the parts of the map since moving on a white background is kinda like doing nothing. Then it would be good to paint squares or any simple shape that for now will be the resource ores or trees for example, and lastly make it so we can move around the world we created, so let's go step by step:
 
