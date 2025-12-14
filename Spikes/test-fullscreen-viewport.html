@@ -1,0 +1,108 @@
+<style>
+  body { margin: 0; overflow: hidden; background-color: #222; } /* Fondo oscuro para probar estilo */
+  canvas { display: block; }
+</style>
+<canvas id="world"></canvas>
+
+<script>
+const canvas = document.getElementById('world');
+const ctx = canvas.getContext('2d');
+
+// Estado del juego
+let camera = { x: 0, y: 0 };
+let isDragging = false;
+let dragStart = { x: 0, y: 0 };
+
+// Configuración visual
+const CELL_SIZE = 50;
+const GRID_COLOR = "#333"; // Gris sutil sobre el fondo oscuro
+
+function resize() {
+  // Tu lógica de DPI que ya tenías controlada en spike.md
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.scale(dpr, dpr);
+  draw();
+}
+
+function draw() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  
+  // Limpiar pantalla
+  ctx.clearRect(0, 0, width, height);
+  
+  ctx.beginPath();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = GRID_COLOR;
+
+  // --- LÓGICA DE GRID INFINITO ---
+  // El truco es: ¿Cuál es el resto de dividir la cámara por el tamaño de celda?
+  // Eso nos dice el "desplazamiento" inicial de la primera línea.
+  
+  const offsetX = camera.x % CELL_SIZE;
+  const offsetY = camera.y % CELL_SIZE;
+
+  // Dibujar Verticales
+  // Empezamos dibujando desde el residuo (offset) para dar la ilusión de continuidad
+  for (let x = offsetX; x < width; x += CELL_SIZE) {
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+  }
+
+  // Dibujar Horizontales
+  for (let y = offsetY; y < height; y += CELL_SIZE) {
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, 0); // Ojo aquí, es width en X
+    ctx.lineTo(width, y); // Corrección: lineTo(width, y)
+    // Forma correcta simplificada:
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+  }
+  
+  ctx.stroke();
+  
+  // Referencia visual (un círculo en el 0,0 real del mundo) para ver que nos movemos
+  // Para dibujar objetos del mundo, la fórmula es: ObjetoX + CameraX
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.arc(camera.x + 100, camera.y + 100, 10, 0, Math.PI * 2); 
+  ctx.fill();
+  ctx.fillStyle = "white";
+  ctx.fillText("Objeto fijo en (100,100)", camera.x + 115, camera.y + 105);
+}
+
+// --- EVENTOS DEL MOUSE (Click Derecho para mover) ---
+
+window.addEventListener('contextmenu', e => e.preventDefault()); // Bloquea el menú del click derecho
+
+canvas.addEventListener('mousedown', e => {
+  if (e.button === 2) { // 2 es click derecho
+    isDragging = true;
+    dragStart.x = e.clientX - camera.x;
+    dragStart.y = e.clientY - camera.y;
+    canvas.style.cursor = 'grabbing';
+  }
+});
+
+canvas.addEventListener('mouseup', () => {
+  isDragging = false;
+  canvas.style.cursor = 'default';
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (isDragging) {
+    camera.x = e.clientX - dragStart.x;
+    camera.y = e.clientY - dragStart.y;
+    draw(); // Redibujar al mover
+  }
+});
+
+window.addEventListener('resize', resize);
+
+// Iniciar
+resize();
+</script>
