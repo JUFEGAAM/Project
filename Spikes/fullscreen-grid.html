@@ -1,7 +1,18 @@
 <html>
-<head>
-    <title>Fullscreen Grid Test</title>
 
+<head>
+  <title>Fullscreen Grid Test</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+<<<<<<< HEAD
 
 <style>
   body {
@@ -17,57 +28,71 @@
     height: 100vh; /*Represent 100% of the viewport height*/
   }
 </style>    
+=======
+    #world {
+      border: 2px solid black;
+      display: block;
+      flex-shrink: 0;
+      /*Makes the grid unshrinkable by the browser*/
+      width: 100vw;
+      /*Represent 100% of the viewport width*/
+      height: 100vh;
+      /*Represent 100% of the viewport height*/
+    }
+  </style>
+>>>>>>> fc47a19 (test)
 </head>
+
 <body>
-    <canvas id="world"></canvas> <!--We deleted width and height attributes because for Fullscreen we dont need them-->
-<script>
-  let world = document.getElementById("world"); // We create the "world" variable that points to the canvas ID
-  const ctx = world.getContext("2d"); // We tell it that we want the canvas context to be 2D
+  <canvas id="world"></canvas> <!--We deleted width and height attributes because for Fullscreen we dont need them-->
+  <script>
+    let world = document.getElementById("world"); // We create the "world" variable that points to the canvas ID
+    const ctx = world.getContext("2d"); // We tell it that we want the canvas context to be 2D
 
-  function drawGrid(lineWidth, cellWidth, cellHeight, color) {
-  // Line properties
-  ctx.strokeStyle = color;
-  ctx.lineWidth = lineWidth;
+    function drawGrid(lineWidth, cellWidth, cellHeight, color) {
+      // Line properties
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
 
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
 
-  // Draw vertical lines
-  for (let x = 0; x <= width; x += cellWidth) {
-    ctx.beginPath(); // The line will be drawn from here
-    ctx.moveTo(x, 0); // Move the starting point to 0 on the x and y axes
-    ctx.lineTo(x, height); // We stay on x and go up to the value set in "height"
-    ctx.stroke(); // This ensures that every drawn line has the spacing set in "cellWidth"
-  }
+      // Draw vertical lines
+      for (let x = 0; x <= width; x += cellWidth) {
+        ctx.beginPath(); // The line will be drawn from here
+        ctx.moveTo(x, 0); // Move the starting point to 0 on the x and y axes
+        ctx.lineTo(x, height); // We stay on x and go up to the value set in "height"
+        ctx.stroke(); // This ensures that every drawn line has the spacing set in "cellWidth"
+      }
 
-  // Draw horizontal lines
-  for (let y = 0; y <= height; y += cellHeight) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-    ctx.stroke();
-  }
-}
-// Formerly, the drawGrid function was here, which caused problems
-function accountForDPI() {
-  const dpr = window.devicePixelRatio || 1; // This gets us how many pixels are drawn per physical pixel; if nothing is returned, the value is 1
+      // Draw horizontal lines
+      for (let y = 0; y <= height; y += cellHeight) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+    }
+    // Formerly, the drawGrid function was here, which caused problems
+    function accountForDPI() {
+      const dpr = window.devicePixelRatio || 1; // This gets us how many pixels are drawn per physical pixel; if nothing is returned, the value is 1
 
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
 
-// This adapts the internal canvas size to the value obtained from each screen's DPR
-  world.width = width * dpr;
-  world.height = height * dpr;
+      // This adapts the internal canvas size to the value obtained from each screen's DPR
+      world.width = width * dpr;
+      world.height = height * dpr;
 
-  ctx.scale(dpr, dpr);
+      ctx.scale(dpr, dpr);
 
-// Now, keeping the scaling for the appropriate DPR, we set the real canvas size, otherwise everything would look too big
-  world.style.width = `${width}px`;
-  world.style.height = `${height}px`;
-}
-accountForDPI();
-drawGrid(2, 25, 25, "#000"); // By moving the function here, we ensure accountForDPI runs first (getting the monitor DPI by rendering the page) and then the grid is drawn. Otherwise, it corrupted and lines weren't drawn
-</script>
+      // Now, keeping the scaling for the appropriate DPR, we set the real canvas size, otherwise everything would look too big
+      world.style.width = `${width}px`;
+      world.style.height = `${height}px`;
+    }
+    accountForDPI();
+    drawGrid(2, 25, 25, "#000"); // By moving the function here, we ensure accountForDPI runs first (getting the monitor DPI by rendering the page) and then the grid is drawn. Otherwise, it corrupted and lines weren't drawn
+  </script>
 </body>
-</html>
 
+</html>
