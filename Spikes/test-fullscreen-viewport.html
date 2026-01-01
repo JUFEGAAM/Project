@@ -1,108 +1,434 @@
-<style>
-  body { margin: 0; overflow: hidden; background-color: #222; } /* Fondo oscuro para probar estilo */
-  canvas { display: block; }
-</style>
-<canvas id="world"></canvas>
+<!DOCTYPE html>
+<html>
 
-<script>
-const canvas = document.getElementById('world');
-const ctx = canvas.getContext('2d');
+<head>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #0d0d0d;
+      /* Darker background */
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      user-select: none;
+      cursor: default;
+    }
 
-// Estado del juego
-let camera = { x: 0, y: 0 };
-let isDragging = false;
-let dragStart = { x: 0, y: 0 };
+    canvas {
+      display: block;
+    }
 
-// Configuración visual
-const CELL_SIZE = 50;
-const GRID_COLOR = "#333"; // Gris sutil sobre el fondo oscuro
+    /* Left UI: Controls & Inventory */
+    #ui-left {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-function resize() {
-  // Tu lógica de DPI que ya tenías controlada en spike.md
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
-  canvas.style.width = window.innerWidth + 'px';
-  canvas.style.height = window.innerHeight + 'px';
-  ctx.scale(dpr, dpr);
-  draw();
-}
+    /* Right UI: Inspection Panel */
+    #ui-right {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      pointer-events: none;
+    }
 
-function draw() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  
-  // Limpiar pantalla
-  ctx.clearRect(0, 0, width, height);
-  
-  ctx.beginPath();
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = GRID_COLOR;
+    .panel {
+      background: rgba(10, 10, 10, 0.9);
+      color: #eee;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      pointer-events: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      min-width: 160px;
+    }
 
-  // --- LÓGICA DE GRID INFINITO ---
-  // El truco es: ¿Cuál es el resto de dividir la cámara por el tamaño de celda?
-  // Eso nos dice el "desplazamiento" inicial de la primera línea.
-  
-  const offsetX = camera.x % CELL_SIZE;
-  const offsetY = camera.y % CELL_SIZE;
+    h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #888;
+      border-bottom: 1px solid #333;
+      padding-bottom: 5px;
+      letter-spacing: 1px;
+    }
 
-  // Dibujar Verticales
-  // Empezamos dibujando desde el residuo (offset) para dar la ilusión de continuidad
-  for (let x = offsetX; x < width; x += CELL_SIZE) {
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, height);
-  }
+    /* Tile Info Panel */
+    #tile-info {
+      display: none;
+    }
 
-  // Dibujar Horizontales
-  for (let y = offsetY; y < height; y += CELL_SIZE) {
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, 0); // Ojo aquí, es width en X
-    ctx.lineTo(width, y); // Corrección: lineTo(width, y)
-    // Forma correcta simplificada:
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-  }
-  
-  ctx.stroke();
-  
-  // Referencia visual (un círculo en el 0,0 real del mundo) para ver que nos movemos
-  // Para dibujar objetos del mundo, la fórmula es: ObjetoX + CameraX
-  ctx.fillStyle = "red";
-  ctx.beginPath();
-  ctx.arc(camera.x + 100, camera.y + 100, 10, 0, Math.PI * 2); 
-  ctx.fill();
-  ctx.fillStyle = "white";
-  ctx.fillText("Objeto fijo en (100,100)", camera.x + 115, camera.y + 105);
-}
+    #tile-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 4px;
+      display: block;
+    }
 
-// --- EVENTOS DEL MOUSE (Click Derecho para mover) ---
+    #tile-amount {
+      font-size: 28px;
+      color: #4ade80;
+      font-weight: bold;
+    }
 
-window.addEventListener('contextmenu', e => e.preventDefault()); // Bloquea el menú del click derecho
+    .label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-canvas.addEventListener('mousedown', e => {
-  if (e.button === 2) { // 2 es click derecho
-    isDragging = true;
-    dragStart.x = e.clientX - camera.x;
-    dragStart.y = e.clientY - camera.y;
-    canvas.style.cursor = 'grabbing';
-  }
-});
+    /* Inventory Items */
+    .inv-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
 
-canvas.addEventListener('mouseup', () => {
-  isDragging = false;
-  canvas.style.cursor = 'default';
-});
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-right: 10px;
+      display: inline-block;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
 
-canvas.addEventListener('mousemove', e => {
-  if (isDragging) {
-    camera.x = e.clientX - dragStart.x;
-    camera.y = e.clientY - dragStart.y;
-    draw(); // Redibujar al mover
-  }
-});
+<body>
 
-window.addEventListener('resize', resize);
+  <div id="ui-left">
+    <div class="panel">
+      <h3>Controls</h3>
+      🖱️ Right Click: Move<br>
+      ⛏️ Left Click: Mine<br>
+      🔍 Wheel: Zoom
+    </div>
 
-// Iniciar
-resize();
-</script>
+    <div class="panel">
+      <h3>Inventory</h3>
+      <div class="inv-item"><span><span class="dot" style="background:#8B4513"></span>Wood</span> <span
+          id="c-wood">0</span></div>
+      <div class="inv-item"><span><span class="dot" style="background:#222"></span>Coal</span> <span
+          id="c-coal">0</span></div>
+      <div class="inv-item"><span><span class="dot" style="background:#A9A9A9"></span>Iron</span> <span
+          id="c-iron">0</span></div>
+      <div class="inv-item"><span><span class="dot" style="background:#d35400"></span>Copper</span> <span
+          id="c-copper">0</span></div>
+    </div>
+  </div>
+
+  <div id="ui-right">
+    <div id="tile-info" class="panel">
+      <span class="label">Resource</span>
+      <span id="tile-name">Iron Ore</span>
+      <div style="height:10px"></div>
+      <span class="label">Remaining</span>
+      <div id="tile-amount">45</div>
+    </div>
+  </div>
+
+  <canvas id="world"></canvas>
+
+  <script>
+    const world = document.getElementById("world");
+    const ctx = world.getContext("2d");
+
+    // UI Elements
+    const infoPanel = document.getElementById("tile-info");
+    const elName = document.getElementById("tile-name");
+    const elAmount = document.getElementById("tile-amount");
+
+    // --- CONFIGURATION ---
+    const WORLD_SIZE = 8000;
+    const GRID_SIZE = 32; // <--- SMALLER GRID (Higher Resolution)
+    const ZOOM_SENSITIVITY = 0.0005;
+
+    const RES = {
+      WOOD: {id: 'wood', color: '#8B4513', name: 'Raw Wood'},
+      COAL: {id: 'coal', color: '#1a1a1a', name: 'Coal Ore'},
+      IRON: {id: 'iron', color: '#a1a1a1', name: 'Iron Ore'},
+      COPPER: {id: 'copper', color: '#d35400', name: 'Copper Ore'}
+    };
+
+    // --- STATE ---
+    let camera = {x: 0, y: 0};
+    let zoom = 1.0;
+    let isDragging = false;
+    let dragStart = {x: 0, y: 0};
+
+    let worldResources = [];
+    let inventory = {wood: 0, coal: 0, iron: 0, copper: 0};
+    let floatingTexts = [];
+
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let hoveredResource = null;
+
+    // --- LEVEL DESIGN (Preconfigured World) ---
+
+    function initWorld() {
+      // STARTING AREA (Balanced resources nearby)
+      // Center: Iron patch
+      createVein(0, 0, RES.IRON, 5, 5);
+
+      // Nearby Coal (South-East)
+      createVein(200, 200, RES.COAL, 4, 4);
+
+      // Nearby Copper (West)
+      createVein(-250, 0, RES.COPPER, 4, 4);
+
+      // Nearby Small Forest (North)
+      createVein(0, -200, RES.WOOD, 6, 3);
+
+      // --- EXPANSION BASES (Larger & Distinct) ---
+
+      // 1. The Great Forest (West)
+      // A huge dense forest area
+      createVein(-800, -100, RES.WOOD, 12, 12);
+      createVein(-950, 100, RES.WOOD, 8, 8);
+
+      // 2. Iron Outpost (North-East)
+      // Massive iron deposit
+      createVein(800, -600, RES.IRON, 10, 8);
+      createVein(950, -500, RES.IRON, 6, 6);
+
+      // 3. Copper Fields (South)
+      // Sprawling copper veins
+      createVein(100, 800, RES.COPPER, 8, 8);
+      createVein(-100, 950, RES.COPPER, 10, 6);
+
+      // 4. Coal Pits (Far East)
+      createVein(1200, 200, RES.COAL, 10, 10);
+    }
+
+    function createVein(startX, startY, type, w, h) {
+      // Align starting position to grid
+      const baseX = Math.floor(startX / GRID_SIZE) * GRID_SIZE;
+      const baseY = Math.floor(startY / GRID_SIZE) * GRID_SIZE;
+
+      for (let x = 0; x < w; x++) {
+        for (let y = 0; y < h; y++) {
+          // Natural look: Skip some blocks randomly
+          if (Math.random() > 0.9) continue;
+
+          worldResources.push({
+            x: baseX + x * GRID_SIZE,
+            y: baseY + y * GRID_SIZE,
+            type: type.id,
+            name: type.name,
+            color: type.color,
+            amount: 25 + Math.floor(Math.random() * 50),
+            maxAmount: 75
+          });
+        }
+      }
+    }
+
+    // --- UTILS ---
+    function clamp(v, min, max) {return Math.min(Math.max(v, min), max);}
+
+    function screenToWorld(sx, sy) {
+      return {
+        x: (sx - window.innerWidth / 2) / zoom + camera.x,
+        y: (sy - window.innerHeight / 2) / zoom + camera.y
+      };
+    }
+
+    function updateHoverInfo() {
+      const m = screenToWorld(lastMouseX, lastMouseY);
+      hoveredResource = null;
+
+      for (let r of worldResources) {
+        if (m.x >= r.x && m.x < r.x + GRID_SIZE && m.y >= r.y && m.y < r.y + GRID_SIZE) {
+          hoveredResource = r;
+          break;
+        }
+      }
+
+      if (hoveredResource) {
+        infoPanel.style.display = "block";
+        elName.innerText = hoveredResource.name;
+        elName.style.color = hoveredResource.color;
+        elAmount.innerText = hoveredResource.amount;
+      } else {
+        infoPanel.style.display = "none";
+      }
+    }
+
+    // --- DRAWING ---
+    function draw() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, world.width, world.height);
+
+      ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-camera.x, -camera.y);
+
+      drawGrid();
+
+      // Culling Logic
+      const viewW = world.width / zoom;
+      const viewH = world.height / zoom;
+
+      for (const r of worldResources) {
+        if (Math.abs(r.x - camera.x) > viewW && Math.abs(r.y - camera.y) > viewH) continue;
+
+        ctx.fillStyle = r.color;
+        ctx.fillRect(r.x, r.y, GRID_SIZE, GRID_SIZE);
+
+        // Inner Border for "Blocky" feel
+        ctx.strokeStyle = "rgba(0,0,0,0.4)";
+        ctx.lineWidth = 1 / zoom;
+        ctx.strokeRect(r.x, r.y, GRID_SIZE, GRID_SIZE);
+
+        // Highlight hover
+        if (r === hoveredResource) {
+          ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+          ctx.fillRect(r.x, r.y, GRID_SIZE, GRID_SIZE);
+          ctx.strokeStyle = "white";
+          ctx.lineWidth = 2 / zoom;
+          ctx.strokeRect(r.x, r.y, GRID_SIZE, GRID_SIZE);
+        }
+      }
+
+      drawFloatingTexts();
+      if (floatingTexts.length > 0) requestAnimationFrame(draw);
+    }
+
+    function drawGrid() {
+      const limit = WORLD_SIZE / 2;
+      ctx.beginPath();
+
+      // Subtle grid
+      ctx.strokeStyle = "#2a2a2a";
+      ctx.lineWidth = 1 / zoom;
+
+      // Draw lines every 5 blocks for performance & cleaner look at this scale
+      const step = GRID_SIZE;
+
+      // Vertical
+      for (let x = -limit; x <= limit; x += step) {
+        ctx.moveTo(x, -limit); ctx.lineTo(x, limit);
+      }
+      // Horizontal
+      for (let y = -limit; y <= limit; y += step) {
+        ctx.moveTo(-limit, y); ctx.lineTo(limit, y);
+      }
+      ctx.stroke();
+
+      // World Border
+      ctx.strokeStyle = "#d00";
+      ctx.lineWidth = 4 / zoom;
+      ctx.strokeRect(-limit, -limit, WORLD_SIZE, WORLD_SIZE);
+    }
+
+    function drawFloatingTexts() {
+      ctx.font = "bold 20px Arial"; // Slightly smaller for new scale
+      ctx.textAlign = "center";
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        let ft = floatingTexts[i];
+        ctx.fillStyle = `rgba(255,255,255,${ft.life})`;
+        ctx.strokeStyle = `rgba(0,0,0,${ft.life})`;
+        ctx.lineWidth = 3;
+        ctx.strokeText(ft.text, ft.x, ft.y);
+        ctx.fillText(ft.text, ft.x, ft.y);
+
+        ft.y -= 1 / zoom;
+        ft.life -= 0.02;
+        if (ft.life <= 0) floatingTexts.splice(i, 1);
+      }
+    }
+
+    // --- EVENTS ---
+    window.addEventListener('resize', () => {
+      world.width = window.innerWidth;
+      world.height = window.innerHeight;
+      draw();
+    });
+    window.dispatchEvent(new Event('resize'));
+
+    world.addEventListener('wheel', e => {
+      e.preventDefault();
+      // Allow more zoom in since blocks are smaller
+      zoom = clamp(zoom - e.deltaY * ZOOM_SENSITIVITY, 0.2, 5);
+      draw();
+    }, {passive: false});
+
+    world.addEventListener('mousedown', e => {
+      if (e.button === 2) {
+        isDragging = true;
+        dragStart = {x: e.clientX, y: e.clientY};
+        world.style.cursor = "grabbing";
+      }
+      else if (e.button === 0) {
+        const m = screenToWorld(e.clientX, e.clientY);
+        let hit = false;
+
+        for (let i = worldResources.length - 1; i >= 0; i--) {
+          let r = worldResources[i];
+          if (m.x >= r.x && m.x < r.x + GRID_SIZE && m.y >= r.y && m.y < r.y + GRID_SIZE) {
+
+            r.amount--;
+            inventory[r.type]++;
+            document.getElementById('c-' + r.type).innerText = inventory[r.type];
+
+            floatingTexts.push({x: r.x + GRID_SIZE / 2, y: r.y, text: "+1", life: 1});
+
+            if (r === hoveredResource) {
+              elAmount.innerText = r.amount;
+            }
+
+            if (r.amount <= 0) {
+              worldResources.splice(i, 1);
+              if (r === hoveredResource) {
+                hoveredResource = null;
+                infoPanel.style.display = "none";
+              }
+            }
+
+            hit = true;
+            break;
+          }
+        }
+        draw();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      world.style.cursor = "default";
+    });
+
+    window.addEventListener('mousemove', e => {
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+
+      if (isDragging) {
+        camera.x -= (e.clientX - dragStart.x) / zoom;
+        camera.y -= (e.clientY - dragStart.y) / zoom;
+        dragStart = {x: e.clientX, y: e.clientY};
+      }
+
+      updateHoverInfo();
+      draw();
+    });
+
+    window.addEventListener('contextmenu', e => e.preventDefault());
+
+    // INIT
+    initWorld();
+    draw();
+
+  </script>
+</body>
+
+</html>
