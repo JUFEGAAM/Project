@@ -233,3 +233,9 @@ And for the grid to fit all the screen we need these ones.
 ```
 
 We have to delete the size attributes on the **<Canvas>** element because we want the new values to take the lead so the grid fits all the windows and we have to place those new values in all the functions without that nothing will work
+
+### Moving through the world
+
+Now we want to use the "viewport" to make our grid able to move and draw the grid at the same time so it looks like we are moving through a world.
+
+
