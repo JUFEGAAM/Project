@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Core Debt - Final Polished</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #050a14;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      user-select: none;
+    }
+
+    #world {
+      display: block;
+      /* We ensure the canvas takes the full block space */
+      width: 100vw;
+      height: 100vh;
+      cursor: crosshair;
+      /* Default cursor for the map */
+    }
+
+    #ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* START MENU STYLES */
+    #start-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(5, 10, 20, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      pointer-events: auto;
+      backdrop-filter: blur(5px);
+    }
+
+    /* We use a lighter blue for the title as requested */
+    .title-main {
+      font-size: 80px;
+      font-weight: 900;
+      letter-spacing: 10px;
+      color: #48dbfb;
+      text-shadow: 0 0 30px rgba(72, 219, 251, 0.4);
+      margin-bottom: 0;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 50px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .btn-start {
+      background: transparent;
+      border: 2px solid #48dbfb;
+      color: #48dbfb;
+      padding: 15px 50px;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .btn-start:hover {
+      background: #48dbfb;
+      color: #000;
+      box-shadow: 0 0 20px #48dbfb;
+    }
+
+    .dev-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-cheat {
+      background: #111;
+      border: 1px solid #444;
+      color: #666;
+      padding: 6px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: 0.2s;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+
+    .btn-cheat:hover {
+      border-color: #48dbfb;
+      color: #48dbfb;
+    }
+
+    /* We make the God button stand out */
+    .btn-god {
+      border-color: #f1c40f;
+      color: #f1c40f;
+    }
+
+    .btn-god:hover {
+      background: #f1c40f;
+      color: #000;
+    }
+
+    /* Lighter GitHub logo */
+    .github-link {
+      margin-top: 40px;
+      cursor: pointer;
+      opacity: 0.9;
+      transition: opacity 0.3s;
+    }
+
+    .github-link:hover {
+      opacity: 1;
+    }
+
+    .github-link svg {
+      fill: #fff;
+      width: 30px;
+      height: 30px;
+    }
+
+    /* Pure white fill */
+
+    /* HUD STYLES */
+    #hud-top {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
+      pointer-events: auto;
+    }
+
+    .stat-box {
+      background: rgba(20, 30, 40, 0.9);
+      border: 1px solid #446;
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* MISSION PANEL */
+    #mission-panel {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 10, 10, 0.95);
+      border: 2px solid #d63031;
+      padding: 10px 25px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(214, 48, 49, 0.2);
+      pointer-events: auto;
+      transition: all 0.3s;
+    }
+
+    .panic-mode {
+      animation: pulse-red 0.5s infinite alternate;
+      border-color: #ff0000 !important;
+    }
+
+    @keyframes pulse-red {
+      from {
+        box-shadow: 0 0 10px red;
+      }
+
+      to {
+        box-shadow: 0 0 30px red;
+      }
+    }
+
+    .ready-mode {
+      border-color: #48dbfb !important;
+      box-shadow: 0 0 30px rgba(72, 219, 251, 0.5) !important;
+      animation: pulse-blue 1s infinite alternate;
+    }
+
+    @keyframes pulse-blue {
+      from {
+        transform: translateX(-50%) scale(1);
+      }
+
+      to {
+        transform: translateX(-50%) scale(1.05);
+      }
+    }
+
+    .ready-mode #mission-desc {
+      color: #48dbfb;
+    }
+
+    #mission-title {
+      color: #888;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    #mission-desc {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 2px 0;
+    }
+
+    #mission-timer {
+      font-size: 20px;
+      color: #ff7675;
+      font-family: monospace;
+    }
+
+    /* BOSS UI */
+    #boss-ui-container {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    #boss-title {
+      text-align: center;
+      color: #f00;
+      font-weight: bold;
+      font-size: 20px;
+      text-shadow: 0 0 5px #000;
+      margin-bottom: 4px;
+      letter-spacing: 2px;
+    }
+
+    #boss-hp-bar {
+      width: 400px;
+      height: 20px;
+      background: #300;
+      border: 2px solid #f00;
+      border-radius: 4px;
+      position: relative;
+      margin-bottom: 4px;
+      box-shadow: 0 0 15px #f00;
+    }
+
+    #boss-hp-fill {
+      width: 100%;
+      height: 100%;
+      background: #f00;
+      transition: width 0.1s;
+    }
+
+    .hp-marker {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2;
+    }
+
+    .boss-timer-container {
+      width: 400px;
+      height: 8px;
+      position: relative;
+    }
+
+    #boss-timer-bar {
+      width: 100%;
+      height: 100%;
+      background: #002;
+      border: 1px solid #00f;
+      border-radius: 2px;
+      position: absolute;
+    }
+
+    #boss-timer-fill {
+      width: 100%;
+      height: 100%;
+      background: #3498db;
+      transition: width 0.1s linear;
+    }
+
+    #boss-minigame-bar {
+      width: 100%;
+      height: 100%;
+      background: #220;
+      border: 1px solid #f39c12;
+      border-radius: 2px;
+      position: absolute;
+      display: none;
+      z-index: 5;
+    }
+
+    #boss-minigame-fill {
+      width: 100%;
+      height: 100%;
+      background: #f1c40f;
+      transition: width 0.1s linear;
+    }
+
+    /* MINIGAME INSTRUCTIONS */
+    #minigame-text-overlay {
+      position: absolute;
+      top: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      display: none;
+      pointer-events: none;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #minigame-instruction {
+      color: #f1c40f;
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: 2px solid #f1c40f;
+      margin-top: 20px;
+      order: 2;
+      box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+    }
+
+    #minigame-word {
+      font-family: monospace;
+      font-size: 30px;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: 2px solid #f1c40f;
+      color: #fff;
+      display: inline-block;
+      margin-top: 10px;
+      order: 3;
+    }
+
+    #countdown-display {
+      font-size: 100px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 30px #f1c40f;
+      margin-top: 0;
+      animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      order: 1;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .char-done {
+      color: #48dbfb;
+    }
+
+    .char-pending {
+      color: #7f8c8d;
+    }
+
+    /* INVENTORY */
+    #inventory-panel {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #444;
+      padding: 15px;
+      border-radius: 6px;
+      pointer-events: auto;
+    }
+
+    .inv-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      min-width: 140px;
+      font-size: 14px;
+    }
+
+    .cap-warning {
+      color: #e17055;
+      font-size: 12px;
+      margin-top: 5px;
+      text-align: center;
+      display: none;
+    }
+
+    #xp-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 20px;
+      background: #111;
+      border: 2px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      pointer-events: auto;
+    }
+
+    #xp-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #48dbfb, #a29bfe);
+      transition: width 0.2s;
+    }
+
+    #xp-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      line-height: 20px;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    #trash-can {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: rgba(20, 10, 10, 0.9);
+      border: 2px solid #e17055;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    #trash-can:hover {
+      transform: scale(1.1);
+      background: #331111;
+    }
+
+    #trash-tooltip {
+      position: absolute;
+      bottom: 100px;
+      right: 30px;
+      background: #111;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none;
+      color: #e17055;
+    }
+
+    /* MODALS */
+    #modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(5px);
+    }
+
+    #upgrade-container {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: #1e272e;
+      border: 2px solid #555;
+      width: 220px;
+      height: 320px;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.1s ease-out;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      opacity: 0.9;
+      transform: scale(1.0);
+    }
+
+    .card.active-target {
+      opacity: 1;
+      transform: scale(1.1);
+      border-color: #fff;
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+      animation: card-shake 0.15s infinite;
+    }
+
+    @keyframes card-shake {
+      0% {
+        transform: scale(1.1) rotate(0deg);
+      }
+
+      25% {
+        transform: scale(1.1) rotate(1deg);
+      }
+
+      50% {
+        transform: scale(1.1) rotate(0deg);
+      }
+
+      75% {
+        transform: scale(1.1) rotate(-1deg);
+      }
+
+      100% {
+        transform: scale(1.1) rotate(0deg);
+      }
+    }
+
+    #typing-display {
+      font-family: 'Courier New', monospace;
+      font-size: 30px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #333;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px 40px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      min-width: 300px;
+      text-align: center;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .typed-part {
+      color: #48dbfb;
+      text-shadow: 0 0 10px #48dbfb;
+    }
+
+    .pending-part {
+      color: #888;
+    }
+
+    .cursor {
+      animation: blink 1s infinite;
+      color: #48dbfb;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .rarity-tag {
+      font-size: 14px;
+      text-transform: uppercase;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    #message-box {
+      background: #111;
+      border: 2px solid #48dbfb;
+      padding: 40px;
+      text-align: center;
+      max-width: 500px;
+      display: none;
+      box-shadow: 0 0 50px rgba(72, 219, 251, 0.2);
+    }
+
+    button {
+      background: #48dbfb;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #050a14;
+    }
+
+    button:hover {
+      background: #00a8cc;
+      box-shadow: 0 0 15px #00a8cc;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="start-screen">
+    <h1 class="title-main">CORE-DEBT</h1>
+    <p class="subtitle">HARD MODE</p>
+    <button class="btn-start" onclick="startGame(0)">START GAME</button>
+
+    <div style="font-size:12px; color:#555; margin-bottom:5px; margin-top: 20px;">DEV ZONE</div>
+    <div class="dev-controls">
+      <button class="btn-cheat" onclick="startGame(10)">BOSS 1 (Aim)</button>
+      <button class="btn-cheat" onclick="startGame(20)">BOSS 2 (Type)</button>
+      <button class="btn-cheat" onclick="startGame(30)">BOSS 3 (Dir)</button>
+      <button class="btn-cheat" onclick="startGame(40)">BOSS 4 (Mix)</button>
+      <button class="btn-cheat btn-god" onclick="startGame(67)">BOSS GOD</button>
+    </div>
+    <a href="https://github.com/JUFEGAAM/Core-Debt" target="_blank" class="github-link"><svg viewBox="0 0 16 16"
+        xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg></a>
+  </div>
+
+  <div id="ui-layer">
+    <div id="hud-top">
+      <div class="stat-box">HP: <span id="hp-container">❤️❤️❤️</span></div>
+      <div class="stat-box">Storage: <span id="cap-display">0 / 20</span></div>
+      <div class="stat-box">Lvl: <span id="level-display">1</span></div>
+      <div class="stat-box">Power: <span id="power-display">1.0</span></div>
+      <div class="stat-box" style="color:#f1c40f">Luck: <span id="luck-display">1.0</span></div>
+      <div class="stat-box" style="color:#3498db">Level: <span id="mission-count">1</span> / 67</div>
+    </div>
+    <div id="mission-panel" style="display:none;">
+      <div id="mission-title">Core Demand</div>
+      <div id="mission-desc">Get Wood</div>
+      <div id="mission-timer">30.0s</div>
+      <div style="font-size:12px; color:#aaa; margin-top:5px;">Click Core to Deliver</div>
+    </div>
+    <div id="boss-ui-container">
+      <div id="boss-title">CORRUPTED GUARDIAN</div>
+      <div id="boss-hp-bar">
+        <div id="boss-hp-fill"></div>
+        <div id="hp-markers-container"></div>
+      </div>
+      <div class="boss-timer-container">
+        <div id="boss-timer-bar">
+          <div id="boss-timer-fill"></div>
+        </div>
+        <div id="boss-minigame-bar">
+          <div id="boss-minigame-fill"></div>
+        </div>
+      </div>
+    </div>
+    <div id="minigame-text-overlay" style="display:none">
+      <div id="countdown-display" style="display:none">3</div>
+      <div id="minigame-instruction">PREPARE YOURSELF</div>
+      <div id="minigame-word" style="display:none;">LET'S GO!</div>
+    </div>
+    <div id="inventory-panel">
+      <div class="inv-row" style="color:#ecf0f1; text-shadow:0 0 5px white;">Silver: <span id="count-silver">0</span>
+      </div>
+      <div class="inv-row" style="color:#4b4b4b">Iron: <span id="count-iron">0</span></div>
+      <div class="inv-row" style="color:#f1c40f; text-shadow:0 0 5px gold;">Gold: <span id="count-gold">0</span></div>
+      <div class="inv-row" style="color:#e67e22; text-shadow:0 0 3px orange;">Copper: <span id="count-copper">0</span>
+      </div>
+      <div class="inv-row" style="color:#8B4513">Wood: <span id="count-wood">0</span></div>
+      <div id="cap-warning" class="cap-warning">INVENTORY FULL!</div>
+    </div>
+    <div id="xp-container">
+      <div id="xp-fill"></div>
+      <div id="xp-text">0 / 100 XP</div>
+    </div>
+    <div id="trash-can" oncontextmenu="emptyInventory(); return false;" onmouseenter="showTooltip()"
+      onmouseleave="hideTooltip()">
+      🗑️
+    </div>
+    <div id="trash-tooltip">Right-Click to Empty Trash</div>
+  </div>
+  <div id="modal-overlay">
+    <div id="message-box">
+      <div id="message-text"></div>
+      <button id="msg-btn">ACCEPT FATE</button>
+    </div>
+    <div id="upgrade-container" style="display:none;"></div>
+    <div id="typing-display" style="display:none;">
+      <span class="pending-part">TYPE TO SELECT</span><span class="cursor">_</span>
+    </div>
+  </div>
+  <canvas id="world"></canvas>
+  <script>
+    let world = document.getElementById("world"); // We create the "world" variable that points to the canvas ID
+    const ctx = world.getContext("2d"); // We tell it that we want the canvas context to be 2D
+    const GRID_SIZE = 40;
+    const FINAL_MISSION = 67;
+
+    // We define the colors and ids for the different resources in the game
+    const RESOURCES = {
+      WOOD: {id: 'wood', color: '#8B4513', name: 'Wood'},
+      IRON: {id: 'iron', color: '#4b4b4b', name: 'Iron'},  // Dull Dark Gray
+      COPPER: {id: 'copper', color: '#e67e22', name: 'Copper'},
+      SILVER: {id: 'silver', color: '#ecf0f1', name: 'Silver'}, // Bright Light Gray
+      GOLD: {id: 'gold', color: '#f1c40f', name: 'Gold'} // Shiny Gold
+    };
+
+    let gameStarted = false;
+    let camera = {x: 0, y: 0};
+    let zoom = 1.0;
+    let isPaused = true;
+    let shakeOffset = {x: 0, y: 0};
+    let loopId = null;
+
+    let player = {
+      hp: 3, maxHp: 3, xp: 0, maxXp: 100, level: 1,
+      power: 1.0, capacity: 20, currentLoad: 0,
+      luck: 1.0, xpMultiplier: 1.0,
+      inventory: {wood: 0, iron: 0, copper: 0, silver: 0, gold: 0}
+    };
+
+    let mission = {
+      active: false, type: null, target: 0,
+      collected: 0, delivered: 0, timeLeft: 0, difficulty: 1,
+      totalCompleted: 0
+    };
+
+    let boss = {
+      active: false, type: "MINION", immune: false,
+      hp: 0, maxHp: 0,
+      timer: 0, maxTimer: 0, strikes: 0,
+      phase: 0,
+      minigameType: null, minigameActive: false,
+      minigameTimer: 0, minigameMaxTimer: 0,
+      currentWord: "", typedIndex: 0, wordsRemaining: 0,
+      tauntTimer: 0
+    };
+
+    let aimTargets = [];
+    let worldResources = [];
+    let floatingTexts = [];
+    let particles = [];
+    let speechBubbles = [];
+    let isDragging = false;
+    let lastMousePos = {x: 0, y: 0};
+    let isHoveringCore = false;
+    let coreScale = 1.0;
+    let coreHappyTimer = 0;
+
+    // We set up the queue for the upgrades so they don't overlap
+    let activeUpgrades = [];
+    let upgradeLock = false;
+    let currentTypingTarget = null;
+    let isUpgradeMenuOpen = false;
+    let upgradeQueue = [];
+
+    const BOSS_TAUNTS = {
+      IDLE: ["TOO SLOW!", "I'M WAITING...", "TICK TOCK", "YOU'LL FAIL", "TRY HARDER"],
+      AIM: ["NO REFLEXES?", "MISSED ME!", "BLIND?", "TOO SLOW!", "LOOK HERE!"],
+      TYPE: ["CAN'T SPELL?", "USE WORDS!", "SLOW TYPER", "ERROR 404", "ABC..."],
+      DIR: ["LOST?", "WRONG WAY!", "NO GPS?", "LEFT OR RIGHT?"],
+      GENERIC: ["OUCH!", "THAT TICKLES!", "IS THAT IT?", "WEAK!", "TRY AGAIN!", "MY SHIELD!", "PATHETIC"]
+    };
+    const TECH_WORDS = ["SYSTEM", "CORE", "ERROR", "VIRUS", "DATA", "CODE", "HACK", "BIOS", "ROOT", "NULL", "VOID", "FATAL", "CRASH", "DUMP", "LOG"];
+
+    function startGame(startLevel) {
+      document.getElementById('start-screen').style.display = 'none';
+      gameStarted = true;
+      isPaused = false;
+      initGame(startLevel);
+    }
+
+    function initGame(startLevel = 0) {
+      if (loopId) cancelAnimationFrame(loopId);
+
+      resize();
+      initWorld();
+      mission.totalCompleted = startLevel;
+      mission.difficulty = Math.floor(startLevel / 5);
+      // We give the player some stats if they start from a higher level for testing
+      if (startLevel > 0) {
+        player.power = 1.0 + (startLevel * 0.5);
+        player.capacity = 20 + (startLevel * 2);
+        player.level = startLevel;
+        player.luck = 1.0 + (startLevel * 0.05);
+      }
+      updateUI();
+      const introMsg = startLevel > 0
+        ? `HARD MODE: LEVEL ${startLevel}.<br>BOSS INCOMING!`
+        : "CORE DEBT: HARD MODE.<br><br>Move with right click.<br>Farm everything you can.<br>And survive all 67 levels.";
+      showMessage(introMsg, () => {
+        if (startLevel > 0 && (startLevel % 5 === 0 || startLevel === 67) && startLevel !== 0) {
+          spawnBoss();
+        } else {
+          nextMission();
+        }
+        gameLoop();
+      });
+    }
+
+    function initWorld() {
+      worldResources = [];
+      createPatch(-200, -200, RESOURCES.WOOD, 3);
+      createPatch(200, 200, RESOURCES.WOOD, 3);
+
+      // We generate the map procedurally with different resources
+      for (let i = 0; i < 250; i++) {
+        const range = 5000;
+        const x = (Math.random() - 0.5) * 2 * range;
+        const y = (Math.random() - 0.5) * 2 * range;
+        const dist = Math.sqrt(x * x + y * y);
+
+        if (dist < 300) continue;
+
+        const rand = Math.random();
+        let type = RESOURCES.WOOD; let size = 2;
+
+        if (dist > 2000 && rand > 0.85) {
+          type = RESOURCES.GOLD; size = 4;
+        } else if (rand > 0.96) {
+          type = RESOURCES.GOLD; size = 2;
+        } else if (rand > 0.85) {
+          type = RESOURCES.SILVER; size = 2;
+        } else if (rand > 0.65) {
+          type = RESOURCES.IRON; size = 3;
+        } else if (rand > 0.45) {
+          type = RESOURCES.COPPER; size = 3;
+        }
+        createPatch(x, y, type, size);
+      }
+    }
+
+    function createPatch(startX, startY, type, size) {
+      const bx = Math.floor(startX / GRID_SIZE) * GRID_SIZE;
+      const by = Math.floor(startY / GRID_SIZE) * GRID_SIZE;
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+          if (Math.random() > 0.3) {
+            worldResources.push({
+              x: bx + (i * GRID_SIZE), y: by + (j * GRID_SIZE),
+              type: type.id, color: type.color, amount: 40 + (Math.random() * 40)
+            });
+          }
+        }
+      }
+    }
+
+    function startMission(typeId, amount, time) {
+      mission.active = true; mission.type = typeId; mission.target = amount; mission.delivered = 0; mission.timeLeft = time;
+      const name = Object.values(RESOURCES).find(r => r.id === typeId).name;
+      document.getElementById('mission-panel').style.display = 'block';
+      document.getElementById('mission-panel').className = '';
+      document.getElementById('mission-title').innerText = `Level ${mission.totalCompleted + 1}`;
+      document.getElementById('mission-desc').innerHTML = `Bring <span style="color:#48dbfb">${mission.delivered}/${amount}</span> ${name}`;
+    }
+
+    function attemptDelivery() {
+      if (boss.active) {spawnFloatingText(0, -60, "KILL THE BOSS!", "#f00"); return;}
+      if (!mission.active) return;
+      const amountInInv = player.inventory[mission.type];
+      if (amountInInv > 0) {
+        player.inventory[mission.type] = 0;
+        mission.delivered += amountInInv;
+        player.currentLoad -= amountInInv;
+        if (player.currentLoad < 0) player.currentLoad = 0;
+        coreHappyTimer = 60;
+        spawnParticles(0, 0, 20, RESOURCES[mission.type.toUpperCase()].color);
+        spawnFloatingText(0, -80, "YUMMY!", "#48dbfb");
+        updateUI();
+        const name = Object.values(RESOURCES).find(r => r.id === mission.type).name;
+        document.getElementById('mission-desc').innerHTML = `Bring <span style="color:#48dbfb">${mission.delivered}/${mission.target}</span> ${name}`;
+        if (mission.delivered >= mission.target) completeMission();
+      } else {
+        spawnFloatingText(0, -80, "WRONG ITEM!", "#e17055");
+      }
+    }
+
+    function completeMission() {
+      mission.active = false;
+      document.getElementById('mission-panel').style.display = 'none';
+      mission.totalCompleted++;
+      mission.difficulty++;
+      updateUI();
+      if (mission.totalCompleted >= FINAL_MISSION) {winGame(); return;}
+
+      if (mission.totalCompleted % 5 === 0 || mission.totalCompleted === 67) {
+        spawnBoss();
+      } else {
+        spawnFloatingText(0, -120, "LEVEL COMPLETE", "#fdcb6e");
+        setTimeout(() => {queueUpgrade("Level Reward");}, 1000);
+      }
+    }
+
+    function spawnBoss() {
+      boss.active = true;
+      boss.immune = false;
+      boss.minigameActive = false;
+      boss.strikes = 0;
+      boss.phase = 0;
+      boss.tauntTimer = 3.0;
+      aimTargets = [];
+      speechBubbles = [];
+
+      // We force reset the camera so the boss is visible
+      camera.x = 0; camera.y = 0; zoom = 0.8;
+
+      // We determine the boss stats based on the level
+      if (mission.totalCompleted === 67) {
+        boss.type = "GOD";
+        boss.maxHp = 2500;
+        boss.maxTimer = 18.0;
+        document.getElementById('boss-title').style.color = "#f1c40f";
+      } else if (mission.totalCompleted % 10 === 0) {
+        boss.type = "DEMIGOD";
+        boss.maxHp = (40 + (mission.totalCompleted * 10)) * 2.0;
+        // Timer: Further reduced (Harder)
+        boss.maxTimer = Math.max(9.0, 12.0 - (mission.totalCompleted * 0.1));
+        document.getElementById('boss-title').style.color = "#e74c3c";
+      } else {
+        boss.type = "MINION";
+        // EASIER START: 30hp base
+        boss.maxHp = 30 + (mission.totalCompleted * 8);
+        // Timer: Further reduced (Harder)
+        boss.maxTimer = Math.max(8.0, 11.0 - (mission.totalCompleted * 0.1));
+        document.getElementById('boss-title').style.color = "#e67e22";
+      }
+
+      boss.hp = boss.maxHp;
+      boss.timer = boss.maxTimer + 0.1;
+      boss.scale = 0.1;
+
+      // Setup the UI for the boss
+      document.getElementById('boss-ui-container').style.display = 'block';
+      document.getElementById('boss-timer-bar').style.display = 'block';
+      document.getElementById('boss-minigame-bar').style.display = 'none';
+      document.getElementById('minigame-text-overlay').style.display = 'none';
+      document.getElementById('boss-title').innerText = boss.type;
+
+      const markers = document.getElementById('hp-markers-container');
+      markers.innerHTML = '';
+
+      if (boss.type !== "MINION") {
+        markers.innerHTML += `<div class="hp-marker" style="left:33%"></div><div class="hp-marker" style="left:66%"></div>`;
+      }
+
+      updateBossUI();
+      spawnFloatingText(0, -150, "BOSS SPAWNED!", "#f00");
+
+      draw();
+    }
+
+    function clickBoss() {
+      if (boss.immune) return;
+      if (boss.minigameActive) {
+        spawnFloatingText(0, -100, "SHIELD ACTIVE!", "#f00");
+        return;
+      }
+      const dmg = player.power;
+      boss.hp -= dmg;
+      boss.scale = 0.9;
+
+      if (Math.random() > 0.6) triggerBossTaunt("GENERIC");
+
+      spawnFloatingText((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, `-${dmg.toFixed(1)}`, "#f00");
+      if (boss.hp <= 0) {
+        killBoss();
+        return;
+      }
+
+      const hpPct = boss.hp / boss.maxHp;
+
+      if (boss.type !== "MINION") {
+        if (boss.phase === 0 && hpPct <= 0.66) startMinigameCountdown(1);
+        else if (boss.phase === 1 && hpPct <= 0.33) startMinigameCountdown(2);
+      }
+      updateBossUI();
+    }
+
+    // We determine the next minigame type beforehand to show it in the text
+    function determineNextMinigame() {
+      if (mission.totalCompleted === 10) boss.minigameType = 'AIM';
+      else if (mission.totalCompleted === 20) boss.minigameType = 'WORD';
+      else if (mission.totalCompleted === 30) boss.minigameType = 'DIR';
+      else {
+        const types = ['AIM', 'WORD', 'DIR'];
+        boss.minigameType = types[Math.floor(Math.random() * types.length)];
+      }
+    }
+
+    function startMinigameCountdown(newPhase) {
+      boss.phase = newPhase;
+      boss.immune = true;
+      boss.minigameActive = false;
+
+      // Determine the minigame HERE
+      determineNextMinigame();
+      let modeName = "PREPARE YOURSELF";
+      if (boss.minigameType === 'AIM') modeName = "AIM MAD";
+      else if (boss.minigameType === 'WORD') modeName = "WRITING CRAZY";
+      else if (boss.minigameType === 'DIR') modeName = "DIRECTIONS TO THE HELL";
+
+      const overlay = document.getElementById('minigame-text-overlay');
+      const countEl = document.getElementById('countdown-display');
+      const instrEl = document.getElementById('minigame-instruction');
+      const wordEl = document.getElementById('minigame-word');
+
+      // We show the overlay with flex to order elements correctly
+      overlay.style.display = 'flex';
+      instrEl.style.display = "block";
+      instrEl.innerText = modeName;
+      wordEl.style.display = "none";
+      countEl.style.display = "block";
+
+      let count = 3;
+      countEl.innerText = count;
+      const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countEl.innerText = count;
+          countEl.style.animation = 'none';
+          countEl.offsetHeight;
+          countEl.style.animation = null;
+        } else {
+          clearInterval(interval);
+          countEl.innerText = "LET'S GO!";
+          // We hide the instruction text so it doesn't block the game
+          instrEl.style.display = "none";
+          setTimeout(() => {
+            countEl.style.display = "none";
+            activateMinigameLogic();
+          }, 800);
+        }
+      }, 800);
+    }
+
+    function activateMinigameLogic() {
+      boss.immune = false;
+      boss.minigameActive = true;
+      const wordEl = document.getElementById('minigame-word');
+
+      const level = mission.totalCompleted;
+
+      // We determine the difficulty of the minigame
+      if (boss.minigameType === 'AIM') {
+        const targets = Math.min(6, 4 + Math.floor(level / 10));
+        spawnAimTargets(targets);
+
+        // Decreased time slightly (Harder)
+        boss.minigameMaxTimer = Math.max(4.5, 7.0 - (level * 0.05));
+        updateMinigameText("CLICK TARGETS");
+        wordEl.style.display = "none";
+        triggerBossTaunt("AIM");
+
+      } else if (boss.minigameType === 'WORD') {
+        boss.wordsRemaining = 3 + Math.floor(level / 15);
+
+        // Decreased time slightly (Harder)
+        boss.minigameMaxTimer = Math.max(2.0, 4.5 - (level * 0.03));
+        nextBossWord();
+        wordEl.style.display = "inline-block";
+        triggerBossTaunt("TYPE");
+
+      } else {
+        boss.wordsRemaining = 5 + Math.floor(level / 10);
+
+        // Decreased time slightly (Harder)
+        boss.minigameMaxTimer = Math.max(2.0, 5.5 - (level * 0.05));
+        nextBossDirection();
+        wordEl.style.display = "inline-block";
+        triggerBossTaunt("DIR");
+      }
+
+      boss.minigameTimer = boss.minigameMaxTimer;
+      document.getElementById('boss-minigame-bar').style.display = 'block';
+    }
+
+    function spawnAimTargets(count) {
+      aimTargets = [];
+      for (let i = 0; i < count; i++) {
+        aimTargets.push({
+          x: (Math.random() - 0.5) * 400,
+          y: (Math.random() - 0.5) * 400,
+          radius: 30
+        });
+      }
+    }
+    function nextBossWord() {
+      boss.currentWord = TECH_WORDS[Math.floor(Math.random() * TECH_WORDS.length)];
+      boss.typedIndex = 0;
+      updateMinigameText("TYPE THE WORD");
+    }
+    function nextBossDirection() {
+      const dirs = ["TOP", "BOTTOM", "LEFT", "RIGHT"];
+      boss.currentWord = dirs[Math.floor(Math.random() * dirs.length)];
+      boss.typedIndex = 0;
+      updateMinigameText("TYPE THE GREEN SIDE");
+    }
+    function updateMinigameText(instr) {
+      document.getElementById('minigame-instruction').innerText = instr;
+      if (boss.minigameType === 'AIM') return;
+      const w = boss.currentWord;
+      const done = w.substring(0, boss.typedIndex);
+      const pend = w.substring(boss.typedIndex);
+      document.getElementById('minigame-word').innerHTML = `<span class="char-done">${done}</span><span class="char-pending">${pend}</span>`;
+    }
+    function checkBossTimer(dt) {
+      if (!boss.active) return;
+      boss.tauntTimer -= dt;
+      if (boss.tauntTimer <= 0) {
+        triggerBossTaunt("IDLE");
+        boss.tauntTimer = 3.0 + Math.random() * 4.0;
+      }
+      if (boss.minigameActive) {
+        boss.minigameTimer -= dt;
+        if (boss.minigameTimer <= 0) {
+          player.hp--;
+          spawnFloatingText(0, 0, "FAILED!", "#f00");
+          updateUI();
+          if (player.hp <= 0) {showMessage("DEFEATED BY SHIELD", () => location.reload()); return;}
+
+          if (boss.minigameType === 'AIM') {
+            const targets = Math.min(6, 4 + Math.floor(mission.totalCompleted / 10));
+            spawnAimTargets(targets);
+          }
+          boss.minigameTimer = boss.minigameMaxTimer;
+        }
+      } else if (!boss.immune) {
+        boss.timer -= dt;
+        if (boss.timer <= 0) {
+          boss.timer = boss.maxTimer;
+          boss.strikes++;
+          player.hp--;
+          spawnFloatingText(0, 0, "-1 HP!", "#f00");
+          triggerBossTaunt("GENERIC");
+          updateUI();
+          if (player.hp <= 0) {showMessage("DEFEATED BY BOSS", () => location.reload()); return;}
+          if (boss.strikes >= 2) bossLeavePunished();
+        }
+      }
+      updateBossUI();
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (isUpgradeMenuOpen) {
+        handleUpgradeTyping(e);
+        return;
+      }
+      if (!isPaused && boss.active && boss.minigameActive && (boss.minigameType === 'WORD' || boss.minigameType === 'DIR')) {
+        const key = e.key.toUpperCase();
+        if (!/^[A-Z]$/.test(key)) return;
+
+        if (key === boss.currentWord[boss.typedIndex]) {
+          boss.typedIndex++;
+          updateMinigameText(boss.minigameType === 'DIR' ? "TYPE THE GREEN SIDE" : "TYPE THE WORD");
+          if (boss.typedIndex >= boss.currentWord.length) {
+            boss.wordsRemaining--;
+            spawnFloatingText(0, -50, "CORRECT!", "#48dbfb");
+            if (boss.wordsRemaining <= 0) {
+              completeMinigame();
+            } else {
+              if (boss.minigameType === 'DIR') {
+                boss.minigameTimer += 2.0;
+                if (boss.minigameTimer > boss.minigameMaxTimer) boss.minigameTimer = boss.minigameMaxTimer;
+                nextBossDirection();
+              } else {
+                boss.minigameTimer = boss.minigameMaxTimer;
+                nextBossWord();
+              }
+            }
+          }
+        } else {
+          // TIME PENALTY LOGIC HERE
+          spawnFloatingText(0, 80, "WRONG! -0.2s", "#e17055");
+          boss.minigameTimer -= 0.2; // REDUCED PENALTY
+        }
+      }
+    });
+
+    function triggerBossTaunt(category) {
+      if (!boss.active) return;
+      const list = BOSS_TAUNTS[category] || BOSS_TAUNTS.GENERIC;
+      const text = list[Math.floor(Math.random() * list.length)];
+      spawnSpeechBubble((Math.random() - 0.5) * 250, -120 - Math.random() * 50, text);
+    }
+
+    function handleUpgradeTyping(e) {
+      if (upgradeLock || activeUpgrades.length === 0) return;
+      const key = e.key.toUpperCase();
+      if (e.key === 'Backspace') {
+        if (currentTypingTarget) {
+          currentTypingTarget.typedIndex--;
+          if (currentTypingTarget.typedIndex <= 0) {
+            currentTypingTarget.typedIndex = 0;
+            const el = document.getElementById(`upg-card-${currentTypingTarget.id}`);
+            el.classList.remove('active-target');
+            currentTypingTarget = null;
+          }
+          updateTypingDisplay();
+        }
+        return;
+      }
+      if (!/^[A-Z]$/.test(key) && key !== " ") return;
+      if (!currentTypingTarget) {
+        const match = activeUpgrades.find(u => u.stats.name[0] === key);
+        if (match) {
+          currentTypingTarget = match; currentTypingTarget.typedIndex = 1;
+          const el = document.getElementById(`upg-card-${match.id}`);
+          el.classList.add('active-target');
+        }
+      } else {
+        const name = currentTypingTarget.stats.name;
+        if (key === name[currentTypingTarget.typedIndex]) {
+          currentTypingTarget.typedIndex++;
+          if (currentTypingTarget.typedIndex >= name.length) selectUpgrade(currentTypingTarget);
+        } else {
+          currentTypingTarget.typedIndex = 0;
+          const el = document.getElementById(`upg-card-${currentTypingTarget.id}`);
+          el.classList.remove('active-target');
+          currentTypingTarget = null;
+        }
+      }
+      updateTypingDisplay();
+    }
+    function clickAimTarget(mx, my) {
+      let hit = -1;
+      for (let i = 0; i < aimTargets.length; i++) {
+        let t = aimTargets[i];
+        let dist = Math.sqrt((mx - t.x) ** 2 + (my - t.y) ** 2);
+        if (dist < t.radius) {hit = i; break;}
+      }
+      if (hit !== -1) {
+        aimTargets.splice(hit, 1);
+        spawnFloatingText(mx, my, "HIT!", "#f1c40f");
+        if (aimTargets.length === 0) completeMinigame();
+      } else {
+        boss.minigameTimer -= 0.2;
+        spawnFloatingText(mx, my, "-0.2s", "#e17055");
+      }
+    }
+    function completeMinigame() {
+      boss.minigameActive = false;
+      document.getElementById('boss-minigame-bar').style.display = 'none';
+      document.getElementById('minigame-text-overlay').style.display = 'none';
+      boss.timer = boss.maxTimer;
+      spawnSpeechBubble(0, -150, "SHIELD BROKEN!");
+    }
+    function bossLeavePunished() {
+      boss.active = false;
+      document.getElementById('boss-ui-container').style.display = 'none';
+      player.power = 1.0;
+      spawnSpeechBubble(0, -100, "BORING...");
+      showMessage("<h1 style='color:#f00'>BOSS LEFT</h1><br>He got bored.<br><b>POWER RESET TO 1.0</b>", () => nextMission());
+    }
+    function killBoss() {
+      if (boss.type === "GOD") {
+        winGame();
+        return;
+      }
+      boss.active = false;
+      document.getElementById('boss-ui-container').style.display = 'none';
+      document.getElementById('minigame-text-overlay').style.display = 'none';
+      spawnParticles(0, 0, 100, "#f00");
+      spawnFloatingText(0, 0, "BOSS DEFEATED!", "#fdcb6e");
+      addXp(100 * mission.difficulty);
+      setTimeout(() => {queueUpgrade("Boss Defeated Reward");}, 1500);
+    }
+
+    // FINAL VICTORY SCREEN
+    function winGame() {
+      isPaused = true;
+      if (loopId) cancelAnimationFrame(loopId);
+      const msg = `
+            <h1 style="color:#f1c40f; font-size:40px; text-shadow:0 0 20px #f1c40f">ENHORABUENA</h1>
+            <p style="font-size:20px; margin: 20px 0;">Te has pasado este juego super difícil.<br>Espero que lo hayas disfrutado.</p>
+            <div style="font-size:12px; color:#888; margin-top:30px;">Made by JUFEGAAM</div>
+            <button onclick="location.reload()" style="margin-top:20px; background:#f1c40f; color:#000;">JUGAR OTRA VEZ</button>
+        `;
+      document.getElementById('message-text').innerHTML = msg;
+      document.getElementById('modal-overlay').style.display = 'flex';
+      document.getElementById('message-box').style.display = 'block';
+      document.getElementById('msg-btn').style.display = 'none';
+      document.getElementById('upgrade-container').style.display = 'none';
+      document.getElementById('typing-display').style.display = 'none';
+    }
+
+    function updateBossUI() {
+      const pct = (boss.hp / boss.maxHp) * 100;
+      document.getElementById('boss-hp-fill').style.width = `${pct}%`;
+      const timePct = (boss.timer / boss.maxTimer) * 100;
+      document.getElementById('boss-timer-fill').style.width = `${timePct}%`;
+      if (boss.minigameActive) {
+        const miniPct = (boss.minigameTimer / boss.minigameMaxTimer) * 100;
+        document.getElementById('boss-minigame-fill').style.width = `${miniPct}%`;
+      }
+    }
+    // The main loop that keeps the game running
+    function gameLoop() {
+      draw();
+      if (!isPaused && gameStarted) {
+        const dt = 1 / 60;
+        shakeOffset = {x: 0, y: 0};
+        if (mission.active) {
+          mission.timeLeft -= dt;
+          document.getElementById('mission-timer').innerText = mission.timeLeft.toFixed(1) + "s";
+          if (mission.timeLeft <= 5.0) {
+            const intensity = (5.0 - mission.timeLeft) * 2;
+            shakeOffset.x = (Math.random() - 0.5) * intensity;
+            shakeOffset.y = (Math.random() - 0.5) * intensity;
+            document.getElementById('mission-panel').classList.add('panic-mode');
+          } else {
+            document.getElementById('mission-panel').classList.remove('panic-mode');
+          }
+          if (mission.timeLeft <= 0) failMission();
+        }
+        if (boss.active) checkBossTimer(dt);
+        const targetScale = isHoveringCore ? 1.2 : 1.0;
+        coreScale += (targetScale - coreScale) * 0.1;
+        if (boss.active && boss.scale < 1.0) boss.scale += 0.05;
+        if (coreHappyTimer > 0) coreHappyTimer--;
+      }
+      loopId = requestAnimationFrame(gameLoop);
+    }
+    // Here we handle the drawing of all elements in the canvas
+    function draw() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // We reset the transformation matrix to clear the canvas correctly
+      ctx.fillStyle = "#050a14";
+      ctx.fillRect(0, 0, world.width, world.height);
+      const dpr = window.devicePixelRatio || 1;
+      ctx.scale(dpr, dpr);
+      const viewCX = window.innerWidth / 2 + shakeOffset.x;
+      const viewCY = window.innerHeight / 2 + shakeOffset.y;
+      ctx.translate(viewCX, viewCY); // We apply the camera position
+      ctx.scale(zoom, zoom); // We apply the zoom level
+      ctx.translate(-camera.x, -camera.y);
+      drawGrid();
+      if (gameStarted) {
+        if (!boss.active) drawCore();
+        if (boss.active) drawBoss();
+        drawResources();
+        drawParticles();
+        drawFloatingTexts();
+        drawSpeechBubbles();
+        if (boss.minigameActive) {
+          if (boss.minigameType === 'AIM') drawAimTargets();
+          if (boss.minigameType === 'DIR') drawDirectionX();
+        }
+      }
+    }
+    function drawDirectionX() {
+      const size = 2000;
+      ctx.globalAlpha = 0.3;
+      const cur = boss.currentWord;
+      ctx.fillStyle = (cur === "TOP") ? "#48dbfb" : "#e74c3c";
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-size, -size); ctx.lineTo(size, -size); ctx.fill();
+      ctx.fillStyle = (cur === "BOTTOM") ? "#48dbfb" : "#e74c3c";
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-size, size); ctx.lineTo(size, size); ctx.fill();
+      ctx.fillStyle = (cur === "LEFT") ? "#48dbfb" : "#e74c3c";
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-size, -size); ctx.lineTo(-size, size); ctx.fill();
+      ctx.fillStyle = (cur === "RIGHT") ? "#48dbfb" : "#e74c3c";
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(size, -size); ctx.lineTo(size, size); ctx.fill();
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("TOP", 0, -350);
+      ctx.fillText("BOTTOM", 0, 350);
+      ctx.fillText("LEFT", -350, 0);
+      ctx.fillText("RIGHT", 350, 0);
+    }
+    // Function to draw the background grid lines
+    function drawGrid() {
+      ctx.strokeStyle = "#1e2a38";
+      ctx.lineWidth = 1.5 / zoom;
+      const step = GRID_SIZE;
+      const viewW = (window.innerWidth / zoom) / 2 + 100;
+      const viewH = (window.innerHeight / zoom) / 2 + 100;
+      const startX = Math.floor((camera.x - viewW) / step) * step;
+      const endX = camera.x + viewW;
+      const startY = Math.floor((camera.y - viewH) / step) * step;
+      const endY = camera.y + viewH;
+      ctx.beginPath();
+      for (let x = startX; x < endX; x += step) {ctx.moveTo(x, startY); ctx.lineTo(x, endY);}
+      for (let y = startY; y < endY; y += step) {ctx.moveTo(startX, y); ctx.lineTo(endX, y);}
+      ctx.stroke();
+    }
+    function drawCore() {
+      const size = GRID_SIZE * 1.2 * coreScale;
+      ctx.fillStyle = "#48dbfb";
+      ctx.shadowBlur = isHoveringCore ? 50 : 30;
+      ctx.shadowColor = "#48dbfb";
+      ctx.beginPath();
+      ctx.arc(0, 0, size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#050a14";
+      ctx.beginPath();
+      ctx.arc(-size * 0.3, -size * 0.2, size * 0.15, 0, Math.PI * 2);
+      ctx.arc(size * 0.3, -size * 0.2, size * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#050a14";
+      ctx.lineWidth = size * 0.1;
+      ctx.beginPath();
+      if (coreHappyTimer > 0) {
+        ctx.fillStyle = "#050a14";
+        ctx.arc(0, size * 0.1, size * 0.4, 0, Math.PI, false);
+        ctx.fill();
+      }
+      else {
+        ctx.arc(0, size * 0.1, size * 0.5, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+      }
+    }
+    function drawBoss() {
+      const size = GRID_SIZE * 3 * boss.scale;
+      ctx.fillStyle = boss.minigameActive ? "#550000" : "#d63031";
+      ctx.shadowBlur = boss.minigameActive ? 10 : 40;
+      ctx.shadowColor = "#d63031";
+      ctx.fillRect(-size / 2, -size / 2, size, size);
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.3, -size * 0.2);
+      ctx.lineTo(-size * 0.1, 0);
+      ctx.lineTo(-size * 0.3, 0);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(size * 0.3, -size * 0.2);
+      ctx.lineTo(size * 0.1, 0);
+      ctx.lineTo(size * 0.3, 0);
+      ctx.fill();
+    }
+    function drawAimTargets() {
+      // Use standard mouse cursor when aiming
+      world.style.cursor = "default";
+
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "#f1c40f";
+      aimTargets.forEach(t => {
+        ctx.fillStyle = "#f1c40f";
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+      ctx.shadowBlur = 0;
+    }
+    function drawSpeechBubbles() {
+      ctx.font = `bold ${14 / zoom}px 'Comic Sans MS', sans-serif`;
+      ctx.textAlign = "center";
+      for (let i = speechBubbles.length - 1; i >= 0; i--) {
+        let b = speechBubbles[i];
+        ctx.fillStyle = "white";
+        const w = ctx.measureText(b.text).width + 20;
+        const h = 30;
+        ctx.beginPath();
+        ctx.roundRect(b.x - w / 2, b.y - h / 2, w, h, 10);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y + h / 2);
+        ctx.lineTo(b.x + 10, b.y + h / 2 + 10);
+        ctx.lineTo(b.x + 10, b.y + h / 2);
+        ctx.fill();
+        ctx.fillStyle = "black";
+        ctx.fillText(b.text, b.x, b.y + 5);
+        b.y -= 0.5;
+        b.life -= 0.02;
+        if (b.life <= 0) speechBubbles.splice(i, 1);
+      }
+    }
+    function drawResources() {
+      worldResources.forEach(res => {
+        ctx.fillStyle = res.color || '#ff00ff';
+        if (res.type === 'wood') {
+          ctx.beginPath();
+          ctx.arc(res.x + GRID_SIZE / 2, res.y + GRID_SIZE / 2, (GRID_SIZE / 2) - 4, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(res.x, res.y, GRID_SIZE, GRID_SIZE);
+          ctx.strokeStyle = "rgba(0,0,0,0.5)";
+          ctx.lineWidth = 1 / zoom;
+          ctx.strokeRect(res.x, res.y, GRID_SIZE, GRID_SIZE);
+          if (['silver', 'gold', 'copper', 'iron'].includes(res.type)) {
+            ctx.fillStyle = "rgba(255,255,255,0.3)";
+            ctx.fillRect(res.x + 4, res.y + 4, 10, 10);
+
+            // Extra shine for metals
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath();
+            ctx.arc(res.x + GRID_SIZE - 8, res.y + 8, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      });
+    }
+    function spawnParticles(x, y, count, color) {
+      for (let i = 0; i < count; i++) particles.push({
+        x: x + (Math.random() - 0.5) * 100,
+        y: y + (Math.random() - 0.5) * 100,
+        color: color,
+        life: 1.0
+      });
+    }
+    function drawParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        p.x += (0 - p.x) * 0.1;
+        p.y += (0 - p.y) * 0.1;
+        p.life -= 0.03;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+    function spawnSpeechBubble(x, y, text) {
+      speechBubbles.push({x, y, text, life: 2.0});
+    }
+    function spawnFloatingText(x, y, text, color) {
+      floatingTexts.push({x, y, text, color, life: 1.0});
+    }
+    function drawFloatingTexts() {
+      ctx.textAlign = "center";
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        let ft = floatingTexts[i];
+        ctx.fillStyle = ft.color;
+        ctx.globalAlpha = ft.life;
+        ctx.font = `bold ${16 / zoom}px Arial`;
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.globalAlpha = 1;
+        ft.y -= 1 / zoom;
+        ft.life -= 0.02;
+        if (ft.life <= 0) floatingTexts.splice(i, 1);
+      }
+    }
+    function winGame() {
+      showMessage("<h1 style='color:#fdcb6e'>VICTORY!</h1><br>Total Missions: " + mission.totalCompleted, () => location.reload());
+    }
+    function failMission() {
+      mission.active = false;
+      document.getElementById('mission-panel').style.display = 'none';
+      player.hp--;
+      updateUI();
+      if (player.hp <= 0) showMessage("GAME OVER", () => location.reload());
+      else showMessage("TOO SLOW.<br>-1 HP", () => {nextMission();});
+    }
+    function nextMission() {
+      const types = ['wood', 'wood', 'copper', 'iron', 'silver', 'gold'];
+      let maxIdx = Math.min(Math.floor(mission.difficulty / 2) + 1, types.length);
+      const nextType = types[Math.floor(Math.random() * maxIdx)];
+      // HARD MODE: Less time for missions
+      startMission(nextType, 5 + (mission.difficulty * 3), Math.max(15, 30 - (mission.difficulty * 1)));
+    }
+    function mineAt(wx, wy) {
+      if (player.currentLoad >= player.capacity) {
+        spawnFloatingText(wx, wy, "FULL!", "#e17055");
+        return;
+      }
+      for (let i = worldResources.length - 1; i >= 0; i--) {
+        let res = worldResources[i];
+        if (wx >= res.x && wx <= res.x + GRID_SIZE && wy >= res.y && wy <= res.y + GRID_SIZE) {
+          res.amount -= 10;
+          let gain = player.power;
+          if (player.currentLoad + gain > player.capacity) gain = player.capacity - player.currentLoad;
+          if (gain > 0) {
+            player.inventory[res.type] += gain;
+            player.currentLoad += gain;
+            player.currentLoad = parseFloat(player.currentLoad.toFixed(1));
+            player.inventory[res.type] = parseFloat(player.inventory[res.type].toFixed(1));
+            addXp(2 * player.xpMultiplier);
+            spawnFloatingText(res.x + GRID_SIZE / 2, res.y, `+${gain.toFixed(1)}`, "#fff");
+            updateUI();
+          }
+          if (res.amount <= 0) worldResources.splice(i, 1);
+          return;
+        }
+      }
+    }
+    function addXp(amount) {
+      player.xp += amount;
+      if (player.xp >= player.maxXp) {
+        player.xp -= player.maxXp;
+        player.level++;
+        player.maxXp = Math.floor(player.maxXp * 1.3);
+        spawnFloatingText(camera.x, camera.y, "LEVEL UP!", "#48dbfb");
+        setTimeout(() => {queueUpgrade("Level Up Reward");}, 500);
+      }
+      updateUI();
+    }
+    function emptyInventory() {
+      player.inventory = {wood: 0, iron: 0, copper: 0, silver: 0, gold: 0};
+      player.currentLoad = 0;
+      updateUI();
+      spawnFloatingText(camera.x, camera.y + 100, "TRASH EMPTIED", "#e17055");
+    }
+    function showTooltip() {
+      document.getElementById('trash-tooltip').style.display = 'block';
+    }
+    function hideTooltip() {
+      document.getElementById('trash-tooltip').style.display = 'none';
+    }
+    const UPGRADE_STATS = {
+      common: {color: '#ffffff', power: 0.2, cap: 5, luck: 0.1, xp: 0.1},
+      uncommon: {color: '#48dbfb', power: 0.5, cap: 10, luck: 0.2, xp: 0.2},
+      rare: {color: '#3498db', power: 1.0, cap: 15, luck: 0.3, xp: 0.3},
+      epic: {color: '#9b59b6', power: 1.5, cap: 25, luck: 0.5, xp: 0.5},
+      legendary: {color: '#f1c40f', power: 3.0, cap: 50, luck: 1.0, xp: 1.0}
+    };
+    const UPGRADE_TYPES = [
+      {id: 'power', name: "CLICK BOOST", desc: "Resources per click", apply: (s) => player.power += s.power},
+      {id: 'cap', name: "STORAGE", desc: "+5 Storage", apply: (s) => player.capacity += s.cap},
+      {id: 'xp', name: "EXPERIENCE", desc: "XP Gain", apply: (s) => player.xpMultiplier += s.xp},
+      {id: 'luck', name: "LUCK", desc: "Upgrade Luck", apply: (s) => player.luck += s.luck},
+      {id: 'hp', name: "HEALTH", desc: "Recover 1 HP", apply: (s) => {if (player.hp < player.maxHp) player.hp++;}}
+    ];
+
+    // QUEUE SYSTEM WRAPPER
+    function queueUpgrade(reason) {
+      if (isUpgradeMenuOpen) {
+        upgradeQueue.push(reason);
+      } else {
+        showUpgradeScreen(reason);
+      }
+    }
+
+    function showUpgradeScreen(reasonTitle) {
+      isPaused = true;
+      upgradeLock = false;
+      currentTypingTarget = null;
+      isUpgradeMenuOpen = true;
+      document.getElementById('modal-overlay').style.display = 'flex';
+      document.getElementById('message-box').style.display = 'none';
+      document.getElementById('typing-display').style.display = 'flex';
+      updateTypingDisplay();
+      const container = document.getElementById('upgrade-container');
+      container.style.display = 'flex';
+      container.innerHTML = '';
+      activeUpgrades = [];
+      let shuffledTypes = [...UPGRADE_TYPES].sort(() => 0.5 - Math.random());
+      let selectedTypes = shuffledTypes.slice(0, 3);
+      selectedTypes.forEach((type, index) => {
+        let upg = generateUpgradeStats(type);
+        upg.typedIndex = 0;
+        upg.id = index;
+        activeUpgrades.push(upg);
+        let card = document.createElement('div');
+        card.id = `upg-card-${index}`;
+        card.className = `card rarity-${upg.rarity}`;
+        let shine = "";
+        if (upg.rarity === 'legendary') shine = "box-shadow: 0 0 30px #fdcb6e inset;";
+        if (upg.rarity === 'epic') shine = "box-shadow: 0 0 20px #9b59b6 inset;";
+        if (upg.rarity === 'rare') shine = "box-shadow: 0 0 20px #3498db inset;";
+        card.style = shine;
+        card.innerHTML = `
+          <div style="font-size:12px; color:#888;">${reasonTitle}</div>
+          <h2 style="color:${UPGRADE_STATS[upg.rarity].color}; font-size:20px; margin: 10px 0;">
+            ${upg.stats.name}
+          </h2>
+          <p>${getDesc(upg)}</p>
+          <div class="rarity-tag" style="color:${UPGRADE_STATS[upg.rarity].color}">
+            ${upg.rarity}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    function getDesc(upg) {
+      const s = UPGRADE_STATS[upg.rarity];
+      if (upg.stats.id === 'power') return `+${s.power} Power`;
+      if (upg.stats.id === 'cap') return `+${s.cap} Storage`;
+      if (upg.stats.id === 'xp') return `+${(s.xp * 100).toFixed(0)}% XP`;
+      if (upg.stats.id === 'luck') return `+${s.luck} Luck`;
+      return "Recover HP";
+    }
+    function generateUpgradeStats(typeDef) {
+      const roll = Math.random() * 100;
+      const luckBonus = Math.log10(player.luck) * 2;
+      const T_LEGENDARY = 99.8 - luckBonus;
+      const T_EPIC = 98.8 - luckBonus;
+      const T_RARE = 93.8 - luckBonus;
+      const T_UNCOMMON = 73.8 - luckBonus;
+      let rarity = 'common';
+      if (roll > T_LEGENDARY) rarity = 'legendary';
+      else if (roll > T_EPIC) rarity = 'epic';
+      else if (roll > T_RARE) rarity = 'rare';
+      else if (roll > T_UNCOMMON) rarity = 'uncommon';
+      return {stats: typeDef, rarity: rarity};
+    }
+    function updateTypingDisplay() {
+      const display = document.getElementById('typing-display');
+      if (!currentTypingTarget) {
+        display.innerHTML = '<span class="pending-part">TYPE TO SELECT</span><span class="cursor">_</span>';
+      } else {
+        const name = currentTypingTarget.stats.name;
+        display.innerHTML = `<span class="typed-part">${name.substring(0, currentTypingTarget.typedIndex)}</span><span class="pending-part">${name.substring(currentTypingTarget.typedIndex)}</span><span class="cursor">_</span>`;
+      }
+    }
+    function selectUpgrade(upg) {
+      if (upgradeLock) return;
+      upgradeLock = true;
+      const s = UPGRADE_STATS[upg.rarity];
+      upg.stats.apply(s);
+      spawnFloatingText(camera.x, camera.y, `${upg.stats.name} UP!`, "#fff");
+      player.power = parseFloat(player.power.toFixed(1));
+      player.luck = parseFloat(player.luck.toFixed(1));
+      player.xpMultiplier = parseFloat(player.xpMultiplier.toFixed(1));
+
+      // Close Menu
+      isPaused = false;
+      isUpgradeMenuOpen = false;
+      document.getElementById('modal-overlay').style.display = 'none';
+      document.getElementById('typing-display').style.display = 'none';
+      updateUI();
+
+      // Check Queue
+      if (upgradeQueue.length > 0) {
+        const next = upgradeQueue.shift();
+        setTimeout(() => showUpgradeScreen(next), 200);
+      } else {
+        if (!mission.active && !boss.active) nextMission();
+      }
+    }
+    function updateUI() {
+      let hearts = "";
+      for (let i = 0; i < player.maxHp; i++) hearts += (i < player.hp ? "❤️" : "🖤");
+      document.getElementById('hp-container').innerText = hearts;
+      const capEl = document.getElementById('cap-display');
+      capEl.innerText = `${player.currentLoad.toFixed(1)} / ${player.capacity}`;
+      capEl.style.color = player.currentLoad >= player.capacity ? "#e17055" : "#eee";
+      document.getElementById('cap-warning').style.display = player.currentLoad >= player.capacity ? 'block' : 'none';
+      document.getElementById('level-display').innerText = player.level;
+      document.getElementById('power-display').innerText = player.power.toFixed(1);
+      document.getElementById('luck-display').innerText = player.luck.toFixed(1);
+      document.getElementById('mission-count').innerText = mission.totalCompleted + 1;
+      const xpPct = (player.xp / player.maxXp) * 100;
+      document.getElementById('xp-fill').style.width = `${xpPct}%`;
+      document.getElementById('xp-text').innerText = `${Math.floor(player.xp)} / ${player.maxXp} XP`;
+      document.getElementById('count-wood').innerText = Math.floor(player.inventory.wood);
+      document.getElementById('count-iron').innerText = Math.floor(player.inventory.iron);
+      document.getElementById('count-copper').innerText = Math.floor(player.inventory.copper);
+      document.getElementById('count-silver').innerText = Math.floor(player.inventory.silver);
+      document.getElementById('count-gold').innerText = Math.floor(player.inventory.gold);
+      const panel = document.getElementById('mission-panel');
+      const remainingNeeded = mission.target - mission.delivered;
+      if (mission.active && player.inventory[mission.type] >= remainingNeeded) {
+        panel.classList.add('ready-mode');
+      } else {
+        panel.classList.remove('ready-mode');
+      }
+    }
+    function showMessage(html, callback) {
+      document.getElementById('modal-overlay').style.display = 'flex';
+      document.getElementById('message-box').style.display = 'block';
+      document.getElementById('upgrade-container').style.display = 'none';
+      document.getElementById('typing-display').style.display = 'none';
+      document.getElementById('message-text').innerHTML = html;
+      const btn = document.getElementById('msg-btn');
+      btn.onclick = () => {
+        document.getElementById('modal-overlay').style.display = 'none';
+        if (callback) callback();
+      };
+    }
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      world.width = window.innerWidth * dpr;
+      world.height = window.innerHeight * dpr;
+      world.style.width = window.innerWidth + "px";
+      world.style.height = window.innerHeight + "px";
+    }
+    window.addEventListener('resize', resize);
+    window.addEventListener('contextmenu', e => {if (e.target.id === 'world') e.preventDefault();});
+    window.addEventListener('mousemove', e => {
+      const mx = e.clientX;
+      const my = e.clientY;
+      const viewCX = window.innerWidth / 2 + shakeOffset.x;
+      const viewCY = window.innerHeight / 2 + shakeOffset.y;
+      const wx = (mx - viewCX) / zoom + camera.x;
+      const wy = (my - viewCY) / zoom + camera.y;
+      const dist = Math.sqrt(wx * wx + wy * wy);
+      isHoveringCore = (dist < GRID_SIZE * 1.5);
+      let isHoveringBoss = false;
+      if (boss.active && Math.abs(wx) < GRID_SIZE * 2 && Math.abs(wy) < GRID_SIZE * 2) isHoveringBoss = true;
+      if (isHoveringCore && !boss.active) world.style.cursor = "pointer";
+      else if (isHoveringBoss && !boss.minigameActive) world.style.cursor = "crosshair";
+      else if (boss.minigameActive && boss.minigameType === 'AIM') world.style.cursor = "default";
+      else if (isDragging) world.style.cursor = "grabbing";
+      else world.style.cursor = "default";
+      if (isDragging) {
+        camera.x -= (mx - lastMousePos.x) / zoom;
+        camera.y -= (my - lastMousePos.y) / zoom;
+        lastMousePos = {x: mx, y: my};
+      }
+    });
+    window.addEventListener('mousedown', e => {
+      if (e.button === 2) {
+        isDragging = true;
+        lastMousePos = {x: e.clientX, y: e.clientY};
+        world.style.cursor = "grabbing";
+      }
+      else if (e.button === 0) {
+        if (isUpgradeMenuOpen || document.getElementById('start-screen').style.display !== 'none') {
+          return;
+        }
+        const mx = e.clientX;
+        const my = e.clientY;
+        const viewCX = window.innerWidth / 2 + shakeOffset.x;
+        const viewCY = window.innerHeight / 2 + shakeOffset.y;
+        const wx = (mx - viewCX) / zoom + camera.x;
+        const wy = (my - viewCY) / zoom + camera.y;
+        spawnParticles(wx, wy, 2, "rgba(255,255,255,0.5)");
+        if (boss.active && boss.minigameActive) {
+          if (boss.minigameType === 'AIM') clickAimTarget(wx, wy);
+          return;
+        }
+        if (boss.active && Math.abs(wx) < GRID_SIZE * 2 && Math.abs(wy) < GRID_SIZE * 2) {
+          clickBoss();
+          return;
+        }
+        if (isHoveringCore && !boss.active) attemptDelivery();
+        else mineAt(wx, wy);
+      }
+    });
+    window.addEventListener('mouseup', () => {isDragging = false;});
+    window.addEventListener('wheel', e => {zoom = Math.min(Math.max(zoom - e.deltaY * 0.001, 0.4), 1.6);}, {passive: false});
+    resize();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+
+</html>
