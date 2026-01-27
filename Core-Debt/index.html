@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Core Debt - Final Polished</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div id="start-screen">
+    <h1 class="title-main">CORE-DEBT</h1>
+    <p class="subtitle">HARD MODE</p>
+    <button class="btn-start" onclick="startGame(0)">START GAME</button>
+
+    <div style="font-size:12px; color:#555; margin-bottom:5px; margin-top: 20px;">DEV ZONE</div>
+    <div class="dev-controls">
+      <button class="btn-cheat" onclick="startGame(10)">BOSS 1 (Aim)</button>
+      <button class="btn-cheat" onclick="startGame(20)">BOSS 2 (Type)</button>
+      <button class="btn-cheat" onclick="startGame(30)">BOSS 3 (Dir)</button>
+      <button class="btn-cheat" onclick="startGame(40)">BOSS 4 (Mix)</button>
+      <button class="btn-cheat btn-god" onclick="startGame(67)">BOSS GOD</button>
+    </div>
+    <a href="https://github.com/JUFEGAAM/Core-Debt" target="_blank" class="github-link"><svg viewBox="0 0 16 16"
+        xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg></a>
+  </div>
+
+  <div id="ui-layer">
+    <div id="hud-top">
+      <div class="stat-box">HP: <span id="hp-container">❤️❤️❤️</span></div>
+      <div class="stat-box">Storage: <span id="cap-display">0 / 20</span></div>
+      <div class="stat-box">Lvl: <span id="level-display">1</span></div>
+      <div class="stat-box">Power: <span id="power-display">1.0</span></div>
+      <div class="stat-box" style="color:#f1c40f">Luck: <span id="luck-display">1.0</span></div>
+      <div class="stat-box" style="color:#3498db">Level: <span id="mission-count">1</span> / 67</div>
+    </div>
+    <div id="mission-panel" style="display:none;">
+      <div id="mission-title">Core Demand</div>
+      <div id="mission-desc">Get Wood</div>
+      <div id="mission-timer">30.0s</div>
+      <div style="font-size:12px; color:#aaa; margin-top:5px;">Click Core to Deliver</div>
+    </div>
+    <div id="boss-ui-container">
+      <div id="boss-title">CORRUPTED GUARDIAN</div>
+      <div id="boss-hp-bar">
+        <div id="boss-hp-fill"></div>
+        <div id="hp-markers-container"></div>
+      </div>
+      <div class="boss-timer-container">
+        <div id="boss-timer-bar">
+          <div id="boss-timer-fill"></div>
+        </div>
+        <div id="boss-minigame-bar">
+          <div id="boss-minigame-fill"></div>
+        </div>
+      </div>
+    </div>
+    <div id="minigame-text-overlay" style="display:none">
+      <div id="countdown-display" style="display:none">3</div>
+      <div id="minigame-instruction">PREPARE YOURSELF</div>
+      <div id="minigame-word" style="display:none;">LET'S GO!</div>
+    </div>
+    <div id="inventory-panel">
+      <div class="inv-row" style="color:#ecf0f1; text-shadow:0 0 5px white;">Silver: <span id="count-silver">0</span>
+      </div>
+      <div class="inv-row" style="color:#4b4b4b">Iron: <span id="count-iron">0</span></div>
+      <div class="inv-row" style="color:#f1c40f; text-shadow:0 0 5px gold;">Gold: <span id="count-gold">0</span></div>
+      <div class="inv-row" style="color:#e67e22; text-shadow:0 0 3px orange;">Copper: <span id="count-copper">0</span>
+      </div>
+      <div class="inv-row" style="color:#8B4513">Wood: <span id="count-wood">0</span></div>
+      <div id="cap-warning" class="cap-warning">INVENTORY FULL!</div>
+    </div>
+    <div id="xp-container">
+      <div id="xp-fill"></div>
+      <div id="xp-text">0 / 100 XP</div>
+    </div>
+    <div id="trash-can" oncontextmenu="emptyInventory(); return false;" onmouseenter="showTooltip()"
+      onmouseleave="hideTooltip()">
+      🗑️
+    </div>
+    <div id="trash-tooltip">Right-Click to Empty Trash</div>
+  </div>
+  <div id="modal-overlay">
+    <div id="message-box">
+      <div id="message-text"></div>
+      <button id="msg-btn">ACCEPT FATE</button>
+    </div>
+    <div id="upgrade-container" style="display:none;"></div>
+    <div id="typing-display" style="display:none;">
+      <span class="pending-part">TYPE TO SELECT</span><span class="cursor">_</span>
+    </div>
+  </div>
+  <canvas id="world"></canvas>
+
+  <script src="js/game.js"></script>
+</body>
+
+</html>
